@@ -58,7 +58,7 @@ public class Console {
         StringBuilder buf = new StringBuilder();
         for (int i = 0; i < grid; i++) {
             short word = memory[address + i];
-            char c = (char) (word & 0xff);
+            char c = (char) (word & 0x7f);
             buf.append(c);
         }
 
