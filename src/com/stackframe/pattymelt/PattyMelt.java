@@ -33,6 +33,8 @@ import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 
 /**
  * A simple command line driver for DCPU-16.
@@ -128,14 +130,11 @@ public class PattyMelt {
         return String.format("%04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x",
                 cpu.PC(), cpu.SP(), cpu.O(), cpu.SKIP() ? 1 : 0, cpu.A(), cpu.B(), cpu.C(), cpu.X(), cpu.Y(), cpu.Z(), cpu.I(), cpu.J());
     }
+    private Console console;
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) throws Exception {
-        DCPU16 cpu = new DCPU16Emulator();
-        String filename = args[0];
-        short[] memory = cpu.memory();
+    private void launch(String filename) throws Exception {
+        final DCPU16 cpu = new DCPU16Emulator();
+        final short[] memory = cpu.memory();
         System.err.println("Loading " + filename);
         File file = new File(filename);
 
@@ -148,16 +147,44 @@ public class PattyMelt {
             loadHex(memory, reader);
         }
 
-        final String header = "PC   SP   OV   SKIP A    B    C    X    Y    Z    I    J\n"
-                + "---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----";
-        System.out.println(header);
+        SwingUtilities.invokeAndWait(new Runnable() {
+
+            @Override
+            public void run() {
+                console = new Console(0x8000, memory);
+                JFrame frame = new JFrame("PattyMelt");
+                frame.setSize(800, 600);
+                frame.getContentPane().add(console.getWidget());
+                frame.setVisible(true);
+                final String header = "PC   SP   OV   SKIP A    B    C    X    Y    Z    I    J\n"
+                        + "---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----";
+                System.out.println(header);
+            }
+        });
+
         try {
             while (true) {
-                System.out.println(dumpState(cpu));
+                //System.out.println(dumpState(cpu));
                 cpu.step();
+                SwingUtilities.invokeAndWait(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        console.update();
+                    }
+                });
             }
         } catch (IllegalOpcodeException ioe) {
             System.err.printf("Illegal opcode 0x%04x encountered.\n", ioe.opcode);
         }
+    }
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String[] args) throws Exception {
+        PattyMelt application = new PattyMelt();
+        String filename = args[0];
+        application.launch(filename);
     }
 }
