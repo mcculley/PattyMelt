@@ -41,8 +41,8 @@ public class Console {
     private final int address;
     private final short[] memory;
     private final JTextArea textArea;
-    private final int numColumns = 32;
-    private final int numRows = 16;
+
+    private static final int numRows = 16, numColumns = 32, grid = numRows * numColumns;
 
     public Console(int address, short[] memory) {
         this.address = address;
@@ -56,7 +56,7 @@ public class Console {
 
     public void update() {
         StringBuilder buf = new StringBuilder();
-        for (int i = 0; i < numColumns * numRows; i++) {
+        for (int i = 0; i < grid; i++) {
             short word = memory[address + i];
             char c = (char) (word & 0xff);
             buf.append(c);
