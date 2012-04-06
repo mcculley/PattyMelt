@@ -61,14 +61,6 @@ public interface DCPU16 extends Runnable {
     short O();
 
     /**
-     * // FIXME: This is internal state and should be removed.
-     * Get the skip bit
-     *
-     * @return the current state of the skip bit
-     */
-    boolean SKIP();
-
-    /**
      * Get a given register
      *
      * @param the register to return

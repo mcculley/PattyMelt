@@ -85,11 +85,6 @@ public class DCPU16Emulator implements DCPU16 {
     }
 
     @Override
-    public synchronized boolean SKIP() {
-        return SKIP;
-    }
-
-    @Override
     public synchronized short register(Register r) {
         return memory[0x10000 + r.ordinal()];
     }

@@ -128,10 +128,6 @@ public class PattyMelt {
         return buf.toString();
     }
     
-    private static String dumpState(DCPU16 cpu) {
-        return String.format("%04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x",
-                cpu.PC(), cpu.SP(), cpu.O(), cpu.SKIP() ? 1 : 0, cpu.A(), cpu.B(), cpu.C(), cpu.X(), cpu.Y(), cpu.Z(), cpu.I(), cpu.J());
-    }
     private Console console;
     private StateViewer stateViewer;
     private final DCPU16 cpu = new DCPU16Emulator();
@@ -222,11 +218,7 @@ public class PattyMelt {
                 
                 stateFrame.pack();
                 stateFrame.setLocation(0, 100);
-                stateFrame.setVisible(true);
-                
-                final String header = "PC   SP   OV   SKIP A    B    C    X    Y    Z    I    J\n"
-                        + "---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----";
-                //System.out.println(header);
+                stateFrame.setVisible(true);                
             }
         });
         
