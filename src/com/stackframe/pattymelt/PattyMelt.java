@@ -157,11 +157,13 @@ public class PattyMelt {
                 frame.setSize(640, 480);
                 frame.getContentPane().add(console.getWidget());
                 frame.setVisible(true);
-                stateViewer = new StateViewer(cpu);
 
+                stateViewer = new StateViewer(cpu);
                 JFrame stateFrame = new JFrame("CPU State");
-                stateFrame.setSize(600, 80);
                 stateFrame.getContentPane().add(stateViewer.getWidget());
+                stateFrame.pack();
+                stateFrame.setSize(600, 80);
+                stateFrame.setLocation(0, 100);
                 stateFrame.setVisible(true);
 
                 final String header = "PC   SP   OV   SKIP A    B    C    X    Y    Z    I    J\n"
@@ -172,7 +174,6 @@ public class PattyMelt {
 
         try {
             while (true) {
-                //System.out.println(dumpState(cpu));
                 cpu.step();
                 SwingUtilities.invokeAndWait(new Runnable() {
 
