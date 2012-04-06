@@ -27,12 +27,17 @@
  */
 package com.stackframe.pattymelt;
 
+import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import javax.swing.Box;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
@@ -59,12 +64,12 @@ public class PattyMelt {
             if (v1 == -1) {
                 return;
             }
-
+            
             int v2 = inputStream.read();
             if (v2 == -1) {
                 return;
             }
-
+            
             short value = (short) ((v2 << 8) | v1);
             memory[i++] = value;
         }
@@ -86,12 +91,12 @@ public class PattyMelt {
             if (line == null) {
                 return;
             }
-
+            
             short value = (short) Integer.parseInt(line, 16);
             memory[i++] = value;
         }
     }
-
+    
     private static boolean isBinary(File file) throws IOException {
         // FIXME: Close streams correctly.
         InputStream inputStream = new FileInputStream(file);
@@ -100,7 +105,7 @@ public class PattyMelt {
             if (value == -1) {
                 return false;
             }
-
+            
             char c = (char) value;
             boolean isLetterOrDigit = Character.isLetterOrDigit(c);
             boolean isWhitespace = Character.isWhitespace(c);
@@ -109,7 +114,7 @@ public class PattyMelt {
             }
         }
     }
-
+    
     private static String dumpMemory(int address, int numWords, short[] memory) {
         // FIXME: Make this better. It is a crude bit of debugging right now.
         StringBuilder buf = new StringBuilder();
@@ -119,22 +124,26 @@ public class PattyMelt {
             if (!(Character.isLetterOrDigit(c) || Character.isWhitespace(c))) {
                 c = '.';
             }
-
+            
             buf.append(c);
         }
-
+        
         return buf.toString();
     }
-
+    
     private static String dumpState(DCPU16 cpu) {
         return String.format("%04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x",
                 cpu.PC(), cpu.SP(), cpu.O(), cpu.SKIP() ? 1 : 0, cpu.A(), cpu.B(), cpu.C(), cpu.X(), cpu.Y(), cpu.Z(), cpu.I(), cpu.J());
     }
     private Console console;
     private StateViewer stateViewer;
-
+    private final DCPU16 cpu = new DCPU16Emulator();
+    private final JButton stepButton = new JButton("Step");
+    private final JButton runButton = new JButton("Run");
+    private final JButton stopButton = new JButton("Stop");
+    private volatile boolean running;
+    
     private void launch(String filename) throws Exception {
-        final DCPU16 cpu = new DCPU16Emulator();
         final short[] memory = cpu.memory();
         System.err.println("Loading " + filename);
         File file = new File(filename);
@@ -147,9 +156,9 @@ public class PattyMelt {
             BufferedReader reader = new BufferedReader(new FileReader(filename));
             loadHex(memory, reader);
         }
-
+        
         SwingUtilities.invokeAndWait(new Runnable() {
-
+            
             @Override
             public void run() {
                 console = new Console(0x8000, memory);
@@ -157,34 +166,112 @@ public class PattyMelt {
                 frame.setSize(640, 480);
                 frame.getContentPane().add(console.getWidget());
                 frame.setVisible(true);
-
+                
                 stateViewer = new StateViewer(cpu);
                 JFrame stateFrame = new JFrame("CPU State");
-                stateFrame.getContentPane().add(stateViewer.getWidget());
-                stateFrame.pack();
-                stateFrame.setSize(600, 80);
-                stateFrame.setLocation(0, 100);
-                stateFrame.setVisible(true);
-
-                final String header = "PC   SP   OV   SKIP A    B    C    X    Y    Z    I    J\n"
-                        + "---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----";
-                System.out.println(header);
-            }
-        });
-
-        try {
-            while (true) {
-                cpu.step();
-                SwingUtilities.invokeAndWait(new Runnable() {
-
+                stateFrame.getContentPane().setLayout(new BorderLayout());
+                stateFrame.getContentPane().add(stateViewer.getWidget(), BorderLayout.SOUTH);
+                
+                Box controlBox = Box.createHorizontalBox();
+                controlBox.add(stepButton);
+                controlBox.add(runButton);
+                stopButton.setEnabled(false);
+                controlBox.add(stopButton);
+                stateFrame.getContentPane().add(controlBox, BorderLayout.NORTH);
+                
+                stepButton.addActionListener(new ActionListener() {
+                    
                     @Override
-                    public void run() {
-                        console.update();
-                        stateViewer.update();
+                    public void actionPerformed(ActionEvent ae) {
+                        try {
+                            stepCPU();
+                        } catch (IllegalOpcodeException ioe) {
+                            // FIXME: reflect in GUI
+                            System.err.printf("Illegal opcode 0x%04x encountered.\n", ioe.opcode);
+                        }
                     }
                 });
+                
+                runButton.addActionListener(new ActionListener() {
+                    
+                    @Override
+                    public void actionPerformed(ActionEvent ae) {
+                        runButton.setEnabled(false);
+                        stopButton.setEnabled(true);
+                        stepButton.setEnabled(false);
+                        running = true;
+                        Thread thread = new Thread(
+                                new Runnable() {
+                                    
+                                    @Override
+                                    public void run() {
+                                        runCPU();
+                                    }
+                                }, "DCPU-16");
+                        thread.start();
+                    }
+                });
+                
+                stopButton.addActionListener(new ActionListener() {
+                    
+                    @Override
+                    public void actionPerformed(ActionEvent ae) {
+                        running = false;
+                        runButton.setEnabled(true);
+                        stopButton.setEnabled(false);
+                        stepButton.setEnabled(true);
+                    }
+                });
+                
+                stateFrame.pack();
+                stateFrame.setLocation(0, 100);
+                stateFrame.setVisible(true);
+                
+                final String header = "PC   SP   OV   SKIP A    B    C    X    Y    Z    I    J\n"
+                        + "---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----";
+                //System.out.println(header);
+            }
+        });
+        
+        updatePeripherals();
+    }
+    
+    private void updatePeripheralsInSwingThread() {
+        assert SwingUtilities.isEventDispatchThread();
+        console.update();
+        stateViewer.update();
+    }
+    
+    private void updatePeripherals() {
+        if (SwingUtilities.isEventDispatchThread()) {
+            updatePeripheralsInSwingThread();
+        } else {
+            try {
+                SwingUtilities.invokeAndWait(new Runnable() {
+                    
+                    @Override
+                    public void run() {
+                        updatePeripheralsInSwingThread();
+                    }
+                });
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+    
+    private void stepCPU() throws IllegalOpcodeException {
+        cpu.step();
+        updatePeripherals();
+    }
+    
+    private void runCPU() {
+        try {
+            while (running) {
+                stepCPU();
             }
         } catch (IllegalOpcodeException ioe) {
+            // FIXME: reflect in GUI
             System.err.printf("Illegal opcode 0x%04x encountered.\n", ioe.opcode);
         }
     }
