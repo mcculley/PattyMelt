@@ -147,7 +147,7 @@ public class DCPU16Emulator implements DCPU16 {
             case 0x0d:
             case 0x0e:
             case 0x0f:
-                return memory[0x10000 + (code & 7)];
+                return memory[0x10000 + (code & 7)] & 0xffff;
             case 0x10:
             case 0x11:
             case 0x12:
