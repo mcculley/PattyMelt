@@ -131,6 +131,7 @@ public class PattyMelt {
                 cpu.PC(), cpu.SP(), cpu.O(), cpu.SKIP() ? 1 : 0, cpu.A(), cpu.B(), cpu.C(), cpu.X(), cpu.Y(), cpu.Z(), cpu.I(), cpu.J());
     }
     private Console console;
+    private StateViewer stateViewer;
 
     private void launch(String filename) throws Exception {
         final DCPU16 cpu = new DCPU16Emulator();
@@ -153,9 +154,16 @@ public class PattyMelt {
             public void run() {
                 console = new Console(0x8000, memory);
                 JFrame frame = new JFrame("PattyMelt");
-                frame.setSize(800, 600);
+                frame.setSize(640, 480);
                 frame.getContentPane().add(console.getWidget());
                 frame.setVisible(true);
+                stateViewer = new StateViewer(cpu);
+
+                JFrame stateFrame = new JFrame("CPU State");
+                stateFrame.setSize(600, 80);
+                stateFrame.getContentPane().add(stateViewer.getWidget());
+                stateFrame.setVisible(true);
+
                 final String header = "PC   SP   OV   SKIP A    B    C    X    Y    Z    I    J\n"
                         + "---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----";
                 System.out.println(header);
@@ -171,6 +179,7 @@ public class PattyMelt {
                     @Override
                     public void run() {
                         console.update();
+                        stateViewer.update();
                     }
                 });
             }
