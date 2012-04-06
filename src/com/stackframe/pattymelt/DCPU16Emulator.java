@@ -58,7 +58,7 @@ public class DCPU16Emulator implements DCPU16 {
     private final int O = 0x1000A;
 
     public DCPU16Emulator() {
-        SP((short) 0xffff);
+        SP((short) 0xffff); // FIXME: I think SP should be zero at first?
         for (short i = 0; i < 0x20; i++) {
             memory[0x1000B + i] = i;
         }
