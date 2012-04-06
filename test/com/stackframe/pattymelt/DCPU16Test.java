@@ -50,7 +50,7 @@ public class DCPU16Test {
         }
 
         assertEquals("PC", 0, cpu.PC());
-        assertEquals("SP", (short) 0xFFFF, (short) cpu.SP()); // FIXME: Not sure if this is what SP should be at initial state. Should it be zero?
+        assertEquals("SP", 0, (short) cpu.SP());
         assertEquals("O", 0, cpu.O());
     }
 
