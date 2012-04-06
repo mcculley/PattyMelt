@@ -42,6 +42,7 @@ public class StateViewer {
     private final Box box;
     private final JTextField pcField = new JTextField(4);
     private final JTextField spField = new JTextField(4);
+    private final JTextField oField = new JTextField(4);
     private final JTextField[] registerFields = new JTextField[DCPU16.Register.values().length];
 
     public StateViewer(DCPU16 cpu) {
@@ -58,6 +59,11 @@ public class StateViewer {
         pcBox.add(new JLabel("SP:"));
         spField.setEditable(false);
         pcBox.add(spField);
+
+        pcBox.add(new JSeparator());
+        pcBox.add(new JLabel("O:"));
+        oField.setEditable(false);
+        pcBox.add(oField);
 
         Box registerBox = Box.createHorizontalBox();
         box.add(registerBox);
@@ -78,6 +84,7 @@ public class StateViewer {
     public void update() {
         pcField.setText(String.format("%04x", cpu.PC()));
         spField.setText(String.format("%04x", cpu.SP()));
+        oField.setText(String.format("%04x", cpu.O()));
         for (DCPU16.Register r : DCPU16.Register.values()) {
             JTextField registerField = registerFields[r.ordinal()];
             registerField.setText(String.format("%04x", cpu.register(r)));
