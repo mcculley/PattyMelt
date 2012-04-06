@@ -171,7 +171,7 @@ public class DCPU16Emulator implements DCPU16 {
             case 0x1a:
                 short sp = (short) (SP() - 1);
                 SP(sp);
-                return sp;
+                return sp & 0xffff;
             case 0x1b:
                 return SP;
             case 0x1c:
