@@ -36,10 +36,7 @@ import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
-import javax.swing.Box;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 
 /**
  * A simple command line driver for DCPU-16.
@@ -172,7 +169,7 @@ public class PattyMelt {
                 stateFrame.getContentPane().setLayout(new BorderLayout());
                 stateFrame.getContentPane().add(stateViewer.getWidget(), BorderLayout.SOUTH);
                 
-                Box controlBox = Box.createHorizontalBox();
+                JComponent controlBox = new JPanel();
                 controlBox.add(stepButton);
                 controlBox.add(runButton);
                 stopButton.setEnabled(false);

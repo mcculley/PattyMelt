@@ -48,7 +48,7 @@ public class StateViewer {
     public StateViewer(DCPU16 cpu) {
         this.cpu = cpu;
         box = Box.createVerticalBox();
-        Box pcBox = Box.createHorizontalBox();
+        JComponent pcBox = new JPanel();
         box.add(pcBox);
         JLabel pcLabel = new JLabel("PC:");
         pcBox.add(pcLabel);
@@ -65,7 +65,7 @@ public class StateViewer {
         oField.setEditable(false);
         pcBox.add(oField);
 
-        Box registerBox = Box.createHorizontalBox();
+        JComponent registerBox = new JPanel();
         box.add(registerBox);
 
         for (DCPU16.Register r : DCPU16.Register.values()) {
