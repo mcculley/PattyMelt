@@ -28,6 +28,7 @@
 package com.stackframe.pattymelt;
 
 import java.awt.BorderLayout;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
@@ -37,6 +38,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
 
 /**
  * A simple command line driver for DCPU-16.
@@ -133,6 +135,7 @@ public class PattyMelt {
     private final JButton stepButton = new JButton("Step");
     private final JButton runButton = new JButton("Run");
     private final JButton stopButton = new JButton("Stop");
+    private final MemoryTableModel memoryTableModel = new MemoryTableModel(cpu.memory());
     private volatile boolean running;
     
     private void launch(String filename) throws Exception {
@@ -217,7 +220,18 @@ public class PattyMelt {
                 
                 stateFrame.pack();
                 stateFrame.setLocation(0, 100);
-                stateFrame.setVisible(true);                
+                stateFrame.setVisible(true);
+                
+                JFrame memoryFrame = new JFrame("Memory");
+                JTable memoryTable = new JTable(memoryTableModel);
+                memoryTable.setFont(Font.getFont(Font.MONOSPACED));
+                memoryTable.getTableHeader().setReorderingAllowed(false);
+                // FIXME: How the heck do I force the table cells to be rendered in a monospaced font?
+                ((DefaultTableCellRenderer)memoryTable.getDefaultRenderer(String.class)).setFont(Font.getFont(Font.MONOSPACED));
+                memoryFrame.getContentPane().add(new JScrollPane(memoryTable));
+                memoryFrame.setSize(600, 200);
+                memoryFrame.setLocation(200, 300);
+                memoryFrame.setVisible(true);
             }
         });
         
@@ -228,6 +242,7 @@ public class PattyMelt {
         assert SwingUtilities.isEventDispatchThread();
         console.update();
         stateViewer.update();
+        memoryTableModel.update();
     }
     
     private void updatePeripherals() {
