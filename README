@@ -1,1 +1,7 @@
 PattyMelt is an implementation of notch's DCPU-16 in Java.
+
+Once you have it built, you can run something like:
+
+java -cp build/classes com.stackframe.pattymelt.PattyMelt test/hello.bin
+
+To see hello world program run on the console.
