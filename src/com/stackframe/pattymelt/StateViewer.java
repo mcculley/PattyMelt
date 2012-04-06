@@ -37,7 +37,6 @@ import javax.swing.*;
  */
 public class StateViewer {
 
-    // FIXME: Add a pause/resume button
     // FIXME: Add ability to adjust registers
     private final DCPU16 cpu;
     private final Box box;
