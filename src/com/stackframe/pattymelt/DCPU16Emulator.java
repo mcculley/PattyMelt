@@ -205,13 +205,11 @@ public class DCPU16Emulator implements DCPU16 {
         int pc = PC() & 0xffff;
         short op = memory[pc];
         PC((short) (PC() + 1));
-        short dst;
-        int a, b, aa;
 
         if ((op & 0xF) == 0) {
             switch ((op >> 4) & 0x3F) {
                 case 0x01:
-                    a = memory[dcpu_opr((short) (op >> 10))];
+                    int a = memory[dcpu_opr((short) (op >> 10))];
                     if (SKIP) {
                         SKIP = false;
                     } else {
@@ -227,28 +225,29 @@ public class DCPU16Emulator implements DCPU16 {
             }
         }
 
-        dst = (short) ((op >> 4) & 0x3F);
-        aa = dcpu_opr(dst);
-        a = memory[aa];
+        short dst = (short) ((op >> 4) & 0x3F);
+        int aa = dcpu_opr(dst);
+        int a = memory[aa];
         short b_op = (short) (op >> 10);
         int b_addr = dcpu_opr(b_op);
-        b = memory[b_addr];
+        int b = memory[b_addr];
 
         int res;
-        switch (op & 0xF) {
-            case 0x1:
+        Opcode opcode = Opcode.values()[op & 0xF];
+        switch (opcode) {
+            case SET:
                 res = b;
                 break;
-            case 0x2:
+            case ADD:
                 res = a + b;
                 break;
-            case 0x3:
+            case SUB:
                 res = a - b;
                 break;
-            case 0x4:
+            case MUL:
                 res = a * b;
                 break;
-            case 0x5:
+            case DIV:
                 if (b != 0) {
                     res = a / b;
                 } else {
@@ -256,7 +255,7 @@ public class DCPU16Emulator implements DCPU16 {
                 }
 
                 break;
-            case 0x6:
+            case MOD:
                 if (b != 0) {
                     res = a % b;
                 } else {
@@ -264,22 +263,22 @@ public class DCPU16Emulator implements DCPU16 {
                 }
 
                 break;
-            case 0x7:
+            case SHL:
                 res = a << b;
                 break;
-            case 0x8:
+            case SHR:
                 res = a >> b;
                 break;
-            case 0x9:
+            case AND:
                 res = a & b;
                 break;
-            case 0xA:
+            case BOR:
                 res = a | b;
                 break;
-            case 0xB:
+            case XOR:
                 res = a ^ b;
                 break;
-            case 0xC:
+            case IFE:
                 res = (a == b) ? 1 : 0;
                 if (SKIP) {
                     SKIP = false;
@@ -288,7 +287,7 @@ public class DCPU16Emulator implements DCPU16 {
 
                 SKIP = res == 0;
                 return;
-            case 0xD:
+            case IFN:
                 res = (a != b) ? 1 : 0;
                 if (SKIP) {
                     SKIP = false;
@@ -297,7 +296,7 @@ public class DCPU16Emulator implements DCPU16 {
 
                 SKIP = res == 0;
                 return;
-            case 0xE:
+            case IFG:
                 res = (a > b) ? 1 : 0;
                 if (SKIP) {
                     SKIP = false;
@@ -306,7 +305,7 @@ public class DCPU16Emulator implements DCPU16 {
 
                 SKIP = res == 0;
                 return;
-            case 0xF:
+            case IFB:
                 res = ((a & b) != 0) ? 1 : 0;
                 if (SKIP) {
                     SKIP = false;
@@ -325,28 +324,28 @@ public class DCPU16Emulator implements DCPU16 {
             return;
         }
 
-        switch (op & 0xF) {
-            case 0x2:
-            case 0x3:
-            case 0x4:
-            case 0x5:
-            case 0x7:
-            case 0x8:
+        switch (opcode) {
+            case ADD:
+            case SUB:
+            case MUL:
+            case DIV:
+            case SHL:
+            case SHR:
                 memory[O] = (short) (res >> 16);
-            case 0x1:
-            case 0x6:
-            case 0x9:
-            case 0xA:
-            case 0xB:
+            case SET:
+            case MOD:
+            case AND:
+            case BOR:
+            case XOR:
                 if (dst < 0x1f) {
                     memory[aa] = (short) res;
                 }
 
                 break;
-            case 0xC:
-            case 0xD:
-            case 0xE:
-            case 0xF:
+            case IFE:
+            case IFN:
+            case IFG:
+            case IFB:
                 SKIP = res == 0;
         }
     }

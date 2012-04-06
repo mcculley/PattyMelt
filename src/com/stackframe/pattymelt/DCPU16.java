@@ -39,6 +39,26 @@ public interface DCPU16 extends Runnable {
         A, B, C, X, Y, Z, I, J
     }
 
+    public enum Opcode {
+
+        nonbasic,
+        SET,
+        ADD,
+        SUB,
+        MUL,
+        DIV,
+        MOD,
+        SHL,
+        SHR,
+        AND,
+        BOR,
+        XOR,
+        IFE,
+        IFN,
+        IFG,
+        IFB
+    }
+
     /**
      * Get the program counter
      *
@@ -128,7 +148,7 @@ public interface DCPU16 extends Runnable {
      * Step a single instruction.
      */
     void step() throws IllegalOpcodeException;
-    
+
     /**
      * Get an array that represents the memory.
      *
