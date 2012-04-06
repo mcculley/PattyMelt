@@ -41,10 +41,17 @@ public class StateViewer {
     // FIXME: Add ability to adjust registers
     private final DCPU16 cpu;
     private final Box box;
-    private final JTextField pcField = new JTextField(4);
-    private final JTextField spField = new JTextField(4);
-    private final JTextField oField = new JTextField(4);
+    private final JTextField pcField = makeRegisterField();
+    private final JTextField spField = makeRegisterField();
+    private final JTextField oField = makeRegisterField();
     private final JTextField[] registerFields = new JTextField[DCPU16.Register.values().length];
+
+    private static JTextField makeRegisterField() {
+        JTextField field = new JTextField(4);
+        field.setEditable(false);
+        field.setFont(Font.getFont(Font.MONOSPACED));
+        return field;
+    }
 
     public StateViewer(DCPU16 cpu) {
         this.cpu = cpu;
@@ -53,20 +60,14 @@ public class StateViewer {
         box.add(pcBox);
         JLabel pcLabel = new JLabel("PC:");
         pcBox.add(pcLabel);
-        pcField.setEditable(false);
-        pcField.setFont(Font.getFont(Font.MONOSPACED));
         pcBox.add(pcField);
 
         pcBox.add(new JSeparator());
         pcBox.add(new JLabel("SP:"));
-        spField.setEditable(false);
-        spField.setFont(Font.getFont(Font.MONOSPACED));
         pcBox.add(spField);
 
         pcBox.add(new JSeparator());
         pcBox.add(new JLabel("O:"));
-        oField.setEditable(false);
-        oField.setFont(Font.getFont(Font.MONOSPACED));
         pcBox.add(oField);
 
         JComponent registerBox = new JPanel();
@@ -74,9 +75,7 @@ public class StateViewer {
 
         for (DCPU16.Register r : DCPU16.Register.values()) {
             registerBox.add(new JLabel(r.name() + ":"));
-            JTextField registerField = new JTextField(4);
-            registerField.setEditable(false);
-            registerField.setFont(Font.getFont(Font.MONOSPACED));
+            JTextField registerField = makeRegisterField();
             registerBox.add(registerField);
             registerFields[r.ordinal()] = registerField;
         }
