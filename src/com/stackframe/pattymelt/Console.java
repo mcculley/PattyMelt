@@ -27,6 +27,7 @@
  */
 package com.stackframe.pattymelt;
 
+import java.awt.Font;
 import javax.swing.JComponent;
 import javax.swing.JTextArea;
 
@@ -41,13 +42,13 @@ public class Console {
     private final int address;
     private final short[] memory;
     private final JTextArea textArea;
-
     private static final int numRows = 16, numColumns = 32, grid = numRows * numColumns;
 
     public Console(int address, short[] memory) {
         this.address = address;
         this.memory = memory;
         textArea = new JTextArea(numRows, numColumns);
+        textArea.setFont(Font.getFont(Font.MONOSPACED));
     }
 
     public JComponent getWidget() {
@@ -59,6 +60,8 @@ public class Console {
         for (int i = 0; i < grid; i++) {
             short word = memory[address + i];
             char c = (char) (word & 0x7f);
+            int attributes = (word >> 7) & 0x1ff;
+            // FIXME: We have no idea yet how to correctly interpret the color information.
             buf.append(c);
         }
 
