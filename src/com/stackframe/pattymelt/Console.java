@@ -57,12 +57,21 @@ public class Console {
 
     public void update() {
         StringBuilder buf = new StringBuilder();
-        for (int i = 0; i < grid; i++) {
+        for (int i = 0, col = 0; i < grid; i++, col++) {
             short word = memory[address + i];
-            char c = (char) (word & 0x7f);
-            int attributes = (word >> 7) & 0x1ff;
-            // FIXME: We have no idea yet how to correctly interpret the color information.
-            buf.append(c);
+            if (word != 0) {
+                char c = (char) (word & 0x7f);
+                int attributes = (word >> 7) & 0x1ff;
+                // FIXME: We have no idea yet how to correctly interpret the color information.
+                buf.append(c);
+            } else {
+                buf.append(' ');
+            }
+
+            if (col == numColumns - 1) {
+                buf.append('\n');
+                col = 0;
+            }
         }
 
         textArea.setText(buf.toString());
