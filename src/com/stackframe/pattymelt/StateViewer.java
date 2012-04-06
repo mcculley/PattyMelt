@@ -27,6 +27,7 @@
  */
 package com.stackframe.pattymelt;
 
+import java.awt.Font;
 import javax.swing.*;
 
 /**
@@ -53,16 +54,19 @@ public class StateViewer {
         JLabel pcLabel = new JLabel("PC:");
         pcBox.add(pcLabel);
         pcField.setEditable(false);
+        pcField.setFont(Font.getFont(Font.MONOSPACED));
         pcBox.add(pcField);
 
         pcBox.add(new JSeparator());
         pcBox.add(new JLabel("SP:"));
         spField.setEditable(false);
+        spField.setFont(Font.getFont(Font.MONOSPACED));
         pcBox.add(spField);
 
         pcBox.add(new JSeparator());
         pcBox.add(new JLabel("O:"));
         oField.setEditable(false);
+        oField.setFont(Font.getFont(Font.MONOSPACED));
         pcBox.add(oField);
 
         JComponent registerBox = new JPanel();
@@ -72,6 +76,7 @@ public class StateViewer {
             registerBox.add(new JLabel(r.name() + ":"));
             JTextField registerField = new JTextField(4);
             registerField.setEditable(false);
+            registerField.setFont(Font.getFont(Font.MONOSPACED));
             registerBox.add(registerField);
             registerFields[r.ordinal()] = registerField;
         }
@@ -82,12 +87,12 @@ public class StateViewer {
     }
 
     public void update() {
-        pcField.setText(String.format("%04x", cpu.PC()));
-        spField.setText(String.format("%04x", cpu.SP()));
-        oField.setText(String.format("%04x", cpu.O()));
+        pcField.setText(String.format("%04X", cpu.PC()));
+        spField.setText(String.format("%04X", cpu.SP()));
+        oField.setText(String.format("%04X", cpu.O()));
         for (DCPU16.Register r : DCPU16.Register.values()) {
             JTextField registerField = registerFields[r.ordinal()];
-            registerField.setText(String.format("%04x", cpu.register(r)));
+            registerField.setText(String.format("%04X", cpu.register(r)));
         }
     }
 }
