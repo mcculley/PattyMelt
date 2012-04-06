@@ -127,7 +127,6 @@ public class PattyMelt {
         
         return buf.toString();
     }
-    
     private Console console;
     private StateViewer stateViewer;
     private final DCPU16 cpu = new DCPU16Emulator();
@@ -273,4 +272,5 @@ public class PattyMelt {
         String filename = args[0];
         application.launch(filename);
     }
+    // FIXE: Add support for undoing/going back in time to debug.
 }
