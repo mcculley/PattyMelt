@@ -37,7 +37,7 @@ import javax.swing.*;
  */
 public class StateViewer {
 
-    private static final Font MONO = Font.getFont(Font.MONOSPACED);
+    private static final Font MONO = new Font("Monospaced", Font.PLAIN, 12);
 
     // FIXME: Add a field to show the decoded instruction
     // FIXME: Add ability to adjust registers

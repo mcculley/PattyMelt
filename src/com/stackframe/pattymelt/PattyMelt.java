@@ -224,12 +224,10 @@ public class PattyMelt {
                 
                 JFrame memoryFrame = new JFrame("Memory");
                 JTable memoryTable = new JTable(memoryTableModel);
-                memoryTable.setFont(Font.getFont(Font.MONOSPACED));
+                memoryTable.setFont(new Font("Monospaced", Font.PLAIN, 18));
                 memoryTable.getTableHeader().setReorderingAllowed(false);
-                // FIXME: How the heck do I force the table cells to be rendered in a monospaced font?
-                ((DefaultTableCellRenderer)memoryTable.getDefaultRenderer(String.class)).setFont(Font.getFont(Font.MONOSPACED));
                 memoryFrame.getContentPane().add(new JScrollPane(memoryTable));
-                memoryFrame.setSize(600, 200);
+                memoryFrame.setSize(1000, 200);
                 memoryFrame.setLocation(0, 250);
                 memoryFrame.setVisible(true);
             }
