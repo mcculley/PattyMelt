@@ -120,7 +120,6 @@ public class StateViewer {
             @Override
             public void memoryModified(CPUEvent event) {
             }
-            
         });
     }
 
@@ -128,15 +127,29 @@ public class StateViewer {
         return box;
     }
 
+    /**
+     * A convenience function to avoid the visual jitter when a field gets set
+     * to the same value.
+     *
+     * @param field
+     * @param text
+     */
+    private void setText(JTextField field, String text) {
+        String current = field.getText();
+        if (!current.equals(text)) {
+            field.setText(text);
+        }
+    }
+
     private void update() {
-        pcField.setText(String.format("%04X", cpu.PC()));
-        spField.setText(String.format("%04X", cpu.SP()));
-        oField.setText(String.format("%04X", cpu.O()));
-        instrField.setText(String.format("%04X", cpu.memory().get(cpu.PC())));
-        disField.setText(DCPU16Utilities.disassemble(cpu.memory(), cpu.PC()));
+        setText(pcField, String.format("%04X", cpu.PC()));
+        setText(spField, String.format("%04X", cpu.SP()));
+        setText(oField, String.format("%04X", cpu.O()));
+        setText(instrField, String.format("%04X", cpu.memory().get(cpu.PC())));
+        setText(disField, DCPU16Utilities.disassemble(cpu.memory(), cpu.PC()));
         for (DCPU16.Register r : DCPU16.Register.values()) {
             JTextField registerField = registerFields[r.ordinal()];
-            registerField.setText(String.format("%04X", cpu.register(r)));
+            setText(registerField, String.format("%04X", cpu.register(r)));
         }
     }
 }
