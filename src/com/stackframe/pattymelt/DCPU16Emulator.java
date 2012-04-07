@@ -228,7 +228,7 @@ public class DCPU16Emulator implements DCPU16 {
         short dst = (short) ((op >> 4) & 0x3F);
         int aa = dcpu_opr(dst);
         int a = memory[aa];
-        short b_op = (short) (op >> 10);
+        short b_op = (short) ((op >> 10) & 0x3F);
         int b_addr = dcpu_opr(b_op);
         int b = memory[b_addr];
 
