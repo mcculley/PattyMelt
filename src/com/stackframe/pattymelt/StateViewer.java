@@ -45,13 +45,18 @@ public class StateViewer {
     private final JTextField spField = makeRegisterField();
     private final JTextField oField = makeRegisterField();
     private final JTextField instrField = makeRegisterField();
+    private final JTextField disField = makeField(17);
     private final JTextField[] registerFields = new JTextField[DCPU16.Register.values().length];
 
-    private static JTextField makeRegisterField() {
-        JTextField field = new JTextField(4);
+    private static JTextField makeField(int numColumns) {
+        JTextField field = new JTextField(numColumns);
         field.setEditable(false);
         field.setFont(Font.getFont(Font.MONOSPACED));
         return field;
+    }
+
+    private static JTextField makeRegisterField() {
+        return makeField(4);
     }
 
     public StateViewer(DCPU16 cpu) {
@@ -75,6 +80,10 @@ public class StateViewer {
         pcBox.add(new JLabel("INST:"));
         pcBox.add(instrField);
 
+        pcBox.add(new JSeparator());
+        pcBox.add(new JLabel("DIS:"));
+        pcBox.add(disField);
+
         JComponent registerBox = new JPanel();
         box.add(registerBox);
 
@@ -95,6 +104,7 @@ public class StateViewer {
         spField.setText(String.format("%04X", cpu.SP()));
         oField.setText(String.format("%04X", cpu.O()));
         instrField.setText(String.format("%04X", cpu.memory()[cpu.PC()]));
+        disField.setText(DCPU16Utilities.disassemble(cpu.memory(), cpu.PC()));
         for (DCPU16.Register r : DCPU16.Register.values()) {
             JTextField registerField = registerFields[r.ordinal()];
             registerField.setText(String.format("%04X", cpu.register(r)));
