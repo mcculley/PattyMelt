@@ -40,14 +40,23 @@ import javax.swing.JTextArea;
 public class Console {
 
     // FIXME: Add keyboard support
-    private final int address;
-    private final ShortBuffer memory;
+    private final ArrayMemory textRAM = new ArrayMemory(grid);
     private final JTextArea textArea;
     private static final int numRows = 16, numColumns = 32, grid = numRows * numColumns;
+    private final Peripheral screen = new Peripheral() {
 
-    public Console(int address, ShortBuffer memory) {
-        this.address = address;
-        this.memory = memory;
+        @Override
+        public Memory memory() {
+            return textRAM;
+        }
+
+        @Override
+        public String name() {
+            return "screen";
+        }
+    };
+
+    public Console() {
         textArea = new JTextArea(numRows, numColumns);
         textArea.setFont(new Font("Monospaced", Font.PLAIN, 18));
     }
@@ -59,7 +68,7 @@ public class Console {
     public void update() {
         StringBuilder buf = new StringBuilder();
         for (int i = 0, col = 0; i < grid; i++, col++) {
-            short word = memory.get(address + i);
+            short word = textRAM.get(i);
             if (word != 0) {
                 char c = (char) (word & 0x7f);
                 int attributes = (word >> 7) & 0x1ff;
@@ -76,5 +85,9 @@ public class Console {
         }
 
         textArea.setText(buf.toString());
+    }
+
+    public Peripheral getScreen() {
+        return screen;
     }
 }

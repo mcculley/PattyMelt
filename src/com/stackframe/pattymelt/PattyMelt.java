@@ -54,7 +54,7 @@ public class PattyMelt {
      * @param file a File to read from
      * @throws IOException
      */
-    private static void loadBinary(ShortBuffer memory, File file) throws IOException {
+    private static void loadBinary(Memory memory, File file) throws IOException {
         int i = 0;
         InputStream inputStream = new FileInputStream(file);
         while (true) {
@@ -86,7 +86,7 @@ public class PattyMelt {
      * @param reader a BufferedReader to read from
      * @throws IOException
      */
-    private static void loadHex(ShortBuffer memory, BufferedReader reader) throws IOException {
+    private static void loadHex(Memory memory, BufferedReader reader) throws IOException {
         int i = 0;
         while (true) {
             String line = reader.readLine();
@@ -146,7 +146,7 @@ public class PattyMelt {
     private volatile boolean running;
 
     private void launch(String filename) throws Exception {
-        final ShortBuffer memory = cpu.memory();
+        final Memory memory = cpu.memory();
         File file = new File(filename);
 
         // Try to guess if this is binary or not. Should add an option to be explicit.
@@ -166,7 +166,8 @@ public class PattyMelt {
 
             @Override
             public void run() {
-                console = new Console(0x8000, memory);
+                console = new Console();
+                cpu.install(console.getScreen(), 0x8000);
                 JFrame frame = new JFrame("PattyMelt");
                 frame.setSize(342, 330);
                 frame.getContentPane().add(console.getWidget());

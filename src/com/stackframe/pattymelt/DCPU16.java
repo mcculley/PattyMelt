@@ -176,5 +176,13 @@ public interface DCPU16 extends Runnable {
      *
      * @return a buffer that represents the memory.
      */
-    ShortBuffer memory();
+    Memory memory();
+
+    /**
+     * Install a peripheral.
+     *
+     * @param peripheral the Peripheral to install
+     * @param address the address to mount the memory of the peripheral
+     */
+    void install(Peripheral peripheral, int address);
 }

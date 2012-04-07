@@ -64,7 +64,7 @@ public class DCPU16Test {
     public void initialStateTest() {
         System.out.println("Testing initial state.");
         DCPU16 cpu = new DCPU16Emulator();
-        ShortBuffer memory = cpu.memory();
+        Memory memory = cpu.memory();
         for (int i = 0; i < 0x10000; i++) {
             assertEquals("memory at " + i, 0, memory.get(i));
         }
@@ -119,7 +119,7 @@ public class DCPU16Test {
             0x0000,
             0x0000
         };
-        ShortBuffer memory = cpu.memory();
+        Memory memory = cpu.memory();
         for (int i = 0; i < program.length; i++) {
             memory.put(i,(short)program[i]);
         }

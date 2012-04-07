@@ -41,11 +41,11 @@ import javax.swing.table.TableModel;
  */
 public class MemoryTableModel implements TableModel {
 
-    private final ShortBuffer memory;
+    private final Memory memory;
     private final List<TableModelListener> listeners = new ArrayList<TableModelListener>();
     private static final int columns = 8;
 
-    public MemoryTableModel(ShortBuffer memory) {
+    public MemoryTableModel(Memory memory) {
         this.memory = memory;
     }
 

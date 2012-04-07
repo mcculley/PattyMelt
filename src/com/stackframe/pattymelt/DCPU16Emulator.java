@@ -27,7 +27,9 @@
  */
 package com.stackframe.pattymelt;
 
-import java.nio.ShortBuffer;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * An implementation of DPCU16 that is a simple emulator.
@@ -58,6 +60,49 @@ public class DCPU16Emulator implements DCPU16 {
     private final int SP = 0x10008;
     private final int PC = 0x10009;
     private final int O = 0x1000A;
+    private final Map<Integer, Peripheral> peripherals = new HashMap<Integer, Peripheral>();
+
+    private Peripheral findPeripheral(int address, int mountPoint[]) {
+        for (Entry<Integer, Peripheral> entry : peripherals.entrySet()) {
+            Memory m = entry.getValue().memory();
+            int start = entry.getKey();
+            if (address >= start && address < start + m.size()) {
+                mountPoint[0] = entry.getKey();
+                return entry.getValue();
+            }
+        }
+
+        return null;
+    }
+    private final Memory memoryManager = new Memory() {
+
+        @Override
+        public short get(int address) {
+            int[] mountPoint = new int[1];
+            Peripheral peripheral = findPeripheral(address, mountPoint);
+            if (peripheral != null) {
+                return peripheral.memory().get(address - mountPoint[0]);
+            } else {
+                return memory[address];
+            }
+        }
+
+        @Override
+        public void put(int address, short value) {
+            int[] mountPoint = new int[1];
+            Peripheral peripheral = findPeripheral(address, mountPoint);
+            if (peripheral != null) {
+                peripheral.memory().put(address - mountPoint[0], value);
+            } else {
+                memory[address] = value;
+            }
+        }
+
+        @Override
+        public int size() {
+            return 0x10000;
+        }
+    };
 
     public DCPU16Emulator() {
         for (short i = 0; i < 0x20; i++) {
@@ -66,8 +111,13 @@ public class DCPU16Emulator implements DCPU16 {
     }
 
     @Override
-    public synchronized ShortBuffer memory() {
-        return ShortBuffer.wrap(memory);
+    public void install(Peripheral peripheral, int address) {
+        peripherals.put(address, peripheral);
+    }
+
+    @Override
+    public synchronized Memory memory() {
+        return memoryManager;
     }
 
     @Override
@@ -149,7 +199,7 @@ public class DCPU16Emulator implements DCPU16 {
             case 0x0d:
             case 0x0e:
             case 0x0f:
-                return memory[0x10000 + (code & 7)] & 0xffff;
+                return memoryManager.get(0x10000 + (code & 7)) & 0xffff;
             case 0x10:
             case 0x11:
             case 0x12:
@@ -160,7 +210,7 @@ public class DCPU16Emulator implements DCPU16 {
             case 0x17: {
                 short pc = PC();
                 PC((short) (PC() + 1));
-                return (memory[0x10000 + (code & 7)] + memory[pc]) & 0xffff;
+                return (memoryManager.get(0x10000 + (code & 7)) + memoryManager.get(pc)) & 0xffff;
             }
             case 0x18: {
                 int sp = SP();
@@ -181,7 +231,7 @@ public class DCPU16Emulator implements DCPU16 {
                 return O;
             case 0x1e: {
                 short pc = PC();
-                short v = memory[pc];
+                short v = memoryManager.get(pc);
                 PC((short) (pc + 1));
                 return v;
             }
@@ -205,19 +255,19 @@ public class DCPU16Emulator implements DCPU16 {
     @Override
     public synchronized void step() throws IllegalOpcodeException {
         int pc = PC() & 0xffff;
-        short op = memory[pc];
+        short op = memoryManager.get(pc);
         PC((short) (PC() + 1));
 
         if ((op & 0xF) == 0) {
             switch ((op >> 4) & 0x3F) {
                 case 0x01:
-                    int a = memory[dcpu_opr((short) (op >> 10))];
+                    int a = memoryManager.get(dcpu_opr((short) (op >> 10)));
                     if (SKIP) {
                         SKIP = false;
                     } else {
                         int sp = (SP() - 1) & 0xffff;
                         SP((short) sp);
-                        memory[sp] = PC();
+                        memoryManager.put(sp, PC());
                         PC((short) a);
                     }
 
@@ -229,10 +279,10 @@ public class DCPU16Emulator implements DCPU16 {
 
         short dst = (short) ((op >> 4) & 0x3F);
         int aa = dcpu_opr(dst);
-        int a = memory[aa];
+        int a = memoryManager.get(aa);
         short b_op = (short) ((op >> 10) & 0x3F);
         int b_addr = dcpu_opr(b_op);
-        int b = memory[b_addr];
+        int b = memoryManager.get(b_addr);
 
         int res;
         Opcode opcode = Opcode.values()[op & 0xF];
@@ -333,14 +383,14 @@ public class DCPU16Emulator implements DCPU16 {
             case DIV:
             case SHL:
             case SHR:
-                memory[O] = (short) (res >> 16);
+                memoryManager.put(O, (short) (res >> 16));
             case SET:
             case MOD:
             case AND:
             case BOR:
             case XOR:
                 if (dst < 0x1f) {
-                    memory[aa] = (short) res;
+                    memoryManager.put(aa, (short) res);
                 }
 
                 break;
