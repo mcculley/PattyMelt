@@ -141,7 +141,7 @@ public class PattyMelt {
     private final JButton stepButton = new JButton("Step");
     private final JButton runButton = new JButton("Run");
     private final JButton stopButton = new JButton("Stop");
-    private final MemoryTableModel memoryTableModel = new MemoryTableModel(cpu.memory());
+    private final MemoryTableModel memoryTableModel = new MemoryTableModel(cpu);
     private volatile boolean running;
 
     private void launch(String filename) throws Exception {
@@ -189,7 +189,7 @@ public class PattyMelt {
                     @Override
                     public void actionPerformed(ActionEvent ae) {
                         try {
-                            stepCPU();
+                            cpu.step();
                         } catch (IllegalOpcodeException ioe) {
                             // FIXME: reflect in GUI
                             System.err.printf("Illegal opcode 0x%04x encountered.\n", ioe.opcode);
@@ -242,42 +242,12 @@ public class PattyMelt {
                 memoryFrame.setVisible(true);
             }
         });
-
-        updatePeripherals();
-    }
-
-    private void updatePeripheralsInSwingThread() {
-        assert SwingUtilities.isEventDispatchThread();
-        memoryTableModel.update();
-    }
-
-    private void updatePeripherals() {
-        if (SwingUtilities.isEventDispatchThread()) {
-            updatePeripheralsInSwingThread();
-        } else {
-            try {
-                SwingUtilities.invokeAndWait(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        updatePeripheralsInSwingThread();
-                    }
-                });
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }
-    }
-
-    private void stepCPU() throws IllegalOpcodeException {
-        cpu.step();
-        updatePeripherals();
     }
 
     private void runCPU() {
         try {
             while (running) {
-                stepCPU();
+                cpu.step();
             }
         } catch (IllegalOpcodeException ioe) {
             // FIXME: reflect in GUI

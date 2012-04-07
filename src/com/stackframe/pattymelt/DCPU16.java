@@ -206,21 +206,28 @@ public interface DCPU16 extends Runnable {
         /**
          * Notify that an instruction was executed.
          *
-         * @param event 
+         * @param event the event
          */
         void instructionExecuted(CPUEvent event);
+
+        /**
+         * Notify that memory was modified
+         *
+         * @param event the event
+         */
+        void memoryModified(CPUEvent event);
     }
 
     /**
      * Add a listener.
-     * 
+     *
      * @param l the listener
      */
     void addListener(CPUEventListener l);
 
     /**
      * Remove a listener.
-     * 
+     *
      * @param l the listener
      */
     void removeListener(CPUEventListener l);

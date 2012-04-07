@@ -99,6 +99,11 @@ public class DCPU16Emulator implements DCPU16 {
             } else {
                 memory[address] = value;
             }
+
+            CPUEvent event = new CPUEvent(DCPU16Emulator.this);
+            for (CPUEventListener listener : listeners) {
+                listener.memoryModified(event);
+            }
         }
 
         @Override

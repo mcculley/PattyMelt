@@ -27,7 +27,7 @@
  */
 package com.stackframe.pattymelt;
 
-import java.nio.ShortBuffer;
+import com.stackframe.pattymelt.DCPU16.CPUEvent;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.event.TableModelEvent;
@@ -45,8 +45,19 @@ public class MemoryTableModel implements TableModel {
     private final List<TableModelListener> listeners = new ArrayList<TableModelListener>();
     private static final int columns = 8;
 
-    public MemoryTableModel(Memory memory) {
-        this.memory = memory;
+    public MemoryTableModel(DCPU16 cpu) {
+        cpu.addListener(new DCPU16.CPUEventListener() {
+
+            @Override
+            public void instructionExecuted(CPUEvent event) {
+            }
+
+            @Override
+            public void memoryModified(CPUEvent event) {
+                update();
+            }
+        });
+        this.memory = cpu.memory();
     }
 
     @Override

@@ -116,6 +116,11 @@ public class StateViewer {
                     }
                 }
             }
+
+            @Override
+            public void memoryModified(CPUEvent event) {
+            }
+            
         });
     }
 
