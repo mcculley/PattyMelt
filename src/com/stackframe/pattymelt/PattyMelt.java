@@ -63,12 +63,12 @@ public class PattyMelt {
             if (v1 == -1) {
                 return;
             }
-            
+
             int v2 = inputStream.read();
             if (v2 == -1) {
                 return;
             }
-            
+
             short value = (short) ((v2 << 8) | v1);
             memory[i++] = value;
         }
@@ -90,12 +90,12 @@ public class PattyMelt {
             if (line == null) {
                 return;
             }
-            
+
             short value = (short) Integer.parseInt(line, 16);
             memory[i++] = value;
         }
     }
-    
+
     private static boolean isBinary(File file) throws IOException {
         // FIXME: Close streams correctly.
         InputStream inputStream = new FileInputStream(file);
@@ -104,7 +104,7 @@ public class PattyMelt {
             if (value == -1) {
                 return false;
             }
-            
+
             char c = (char) value;
             boolean isLetterOrDigit = Character.isLetterOrDigit(c);
             boolean isWhitespace = Character.isWhitespace(c);
@@ -113,7 +113,7 @@ public class PattyMelt {
             }
         }
     }
-    
+
     private static String dumpMemory(int address, int numWords, short[] memory) {
         // FIXME: Make this better. It is a crude bit of debugging right now.
         StringBuilder buf = new StringBuilder();
@@ -123,10 +123,10 @@ public class PattyMelt {
             if (!(Character.isLetterOrDigit(c) || Character.isWhitespace(c))) {
                 c = '.';
             }
-            
+
             buf.append(c);
         }
-        
+
         return buf.toString();
     }
     private Console console;
@@ -137,7 +137,7 @@ public class PattyMelt {
     private final JButton stopButton = new JButton("Stop");
     private final MemoryTableModel memoryTableModel = new MemoryTableModel(cpu.memory());
     private volatile boolean running;
-    
+
     private void launch(String filename) throws Exception {
         final short[] memory = cpu.memory();
         System.err.println("Loading " + filename);
@@ -151,9 +151,9 @@ public class PattyMelt {
             BufferedReader reader = new BufferedReader(new FileReader(filename));
             loadHex(memory, reader);
         }
-        
+
         SwingUtilities.invokeAndWait(new Runnable() {
-            
+
             @Override
             public void run() {
                 console = new Console(0x8000, memory);
@@ -161,21 +161,21 @@ public class PattyMelt {
                 frame.setSize(240, 240);
                 frame.getContentPane().add(console.getWidget());
                 frame.setVisible(true);
-                
+
                 stateViewer = new StateViewer(cpu);
                 JFrame stateFrame = new JFrame("CPU State");
                 stateFrame.getContentPane().setLayout(new BorderLayout());
                 stateFrame.getContentPane().add(stateViewer.getWidget(), BorderLayout.SOUTH);
-                
+
                 JComponent controlBox = new JPanel();
                 controlBox.add(stepButton);
                 controlBox.add(runButton);
                 stopButton.setEnabled(false);
                 controlBox.add(stopButton);
                 stateFrame.getContentPane().add(controlBox, BorderLayout.NORTH);
-                
+
                 stepButton.addActionListener(new ActionListener() {
-                    
+
                     @Override
                     public void actionPerformed(ActionEvent ae) {
                         try {
@@ -186,9 +186,9 @@ public class PattyMelt {
                         }
                     }
                 });
-                
+
                 runButton.addActionListener(new ActionListener() {
-                    
+
                     @Override
                     public void actionPerformed(ActionEvent ae) {
                         runButton.setEnabled(false);
@@ -197,7 +197,7 @@ public class PattyMelt {
                         running = true;
                         Thread thread = new Thread(
                                 new Runnable() {
-                                    
+
                                     @Override
                                     public void run() {
                                         runCPU();
@@ -206,9 +206,9 @@ public class PattyMelt {
                         thread.start();
                     }
                 });
-                
+
                 stopButton.addActionListener(new ActionListener() {
-                    
+
                     @Override
                     public void actionPerformed(ActionEvent ae) {
                         running = false;
@@ -217,41 +217,41 @@ public class PattyMelt {
                         stepButton.setEnabled(true);
                     }
                 });
-                
+
                 stateFrame.pack();
                 stateFrame.setLocation(0, 100);
                 stateFrame.setVisible(true);
-                
+
                 JFrame memoryFrame = new JFrame("Memory");
                 JTable memoryTable = new JTable(memoryTableModel);
                 memoryTable.setFont(Font.getFont(Font.MONOSPACED));
                 memoryTable.getTableHeader().setReorderingAllowed(false);
                 // FIXME: How the heck do I force the table cells to be rendered in a monospaced font?
-                ((DefaultTableCellRenderer)memoryTable.getDefaultRenderer(String.class)).setFont(Font.getFont(Font.MONOSPACED));
+                ((DefaultTableCellRenderer) memoryTable.getDefaultRenderer(String.class)).setFont(Font.getFont(Font.MONOSPACED));
                 memoryFrame.getContentPane().add(new JScrollPane(memoryTable));
                 memoryFrame.setSize(600, 200);
                 memoryFrame.setLocation(200, 300);
                 memoryFrame.setVisible(true);
             }
         });
-        
+
         updatePeripherals();
     }
-    
+
     private void updatePeripheralsInSwingThread() {
         assert SwingUtilities.isEventDispatchThread();
         console.update();
         stateViewer.update();
         memoryTableModel.update();
     }
-    
+
     private void updatePeripherals() {
         if (SwingUtilities.isEventDispatchThread()) {
             updatePeripheralsInSwingThread();
         } else {
             try {
                 SwingUtilities.invokeAndWait(new Runnable() {
-                    
+
                     @Override
                     public void run() {
                         updatePeripheralsInSwingThread();
@@ -262,12 +262,12 @@ public class PattyMelt {
             }
         }
     }
-    
+
     private void stepCPU() throws IllegalOpcodeException {
         cpu.step();
         updatePeripherals();
     }
-    
+
     private void runCPU() {
         try {
             while (running) {
