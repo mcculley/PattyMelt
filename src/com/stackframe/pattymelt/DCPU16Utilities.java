@@ -106,7 +106,7 @@ public class DCPU16Utilities {
         short a = (short) ((n >> 4) & 0x3F);
         short b = (short) ((n >> 10) & 0x3F);
         if (op > 0) {
-            buf.append(String.format("%s ", DCPU16.Opcode.values()[op]));
+            buf.append(String.format("%s ", DCPU16.Opcode.name(op)));
             pc = disassembleOperand(memory, pc, a, buf);
             buf.append(", ");
             pc = disassembleOperand(memory, pc, b, buf);

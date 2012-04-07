@@ -38,6 +38,12 @@ public interface DCPU16 extends Runnable {
 
         A, B, C, X, Y, Z, I, J;
 
+        /**
+         * Get the name of a register by number.
+         *
+         * @param n the register number
+         * @return the register name, as a char
+         */
         public static char name(int n) {
             return values()[n].name().charAt(0);
         }
@@ -60,7 +66,17 @@ public interface DCPU16 extends Runnable {
         IFE,
         IFN,
         IFG,
-        IFB
+        IFB;
+
+        /**
+         * Get the name of an opcode by number.
+         *
+         * @param n the opcode number
+         * @return the opcode name
+         */
+        public static String name(int n) {
+            return values()[n].name();
+        }
     }
 
     /**
