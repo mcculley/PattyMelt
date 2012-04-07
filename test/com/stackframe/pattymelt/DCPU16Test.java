@@ -125,18 +125,21 @@ public class DCPU16Test {
         }
 
         // SET A, 0x30 ; 7c01 0030
+        assertEquals("SET A, 0x0030", DCPU16Utilities.disassemble(memory, cpu.PC()));
         cpu.step();
         assertEquals("A", 0x30, cpu.A());
         assertEquals("O", 0x0, cpu.O());
         assertEquals("PC", 0x2, cpu.PC());
 
         // SET [0x1000], 0x20 ; 7de1 1000 0020
+        assertEquals("SET [0x1000], 0x0020", DCPU16Utilities.disassemble(memory, cpu.PC()));
         cpu.step();
         assertEquals("memory", 0x20, memory[0x1000]);
         assertEquals("O", 0x0, cpu.O());
         assertEquals("PC", 0x5, cpu.PC());
 
         // SUB A, [0x1000] ; 7803 1000
+        assertEquals("SUB A, [0x1000]", DCPU16Utilities.disassemble(memory, cpu.PC()));
         cpu.step();
         assertEquals("A", 0x10, cpu.A());
         assertEquals("O", 0x0, cpu.O());
@@ -144,31 +147,37 @@ public class DCPU16Test {
 
         // IFN A, 0x10      ; c00d 
         //    SET PC, crash ; 7dc1 001a
+        assertEquals("IFN A, 0x10", DCPU16Utilities.disassemble(memory, cpu.PC()));
         cpu.step();
+        assertEquals("SET PC, 0x001A", DCPU16Utilities.disassemble(memory, cpu.PC()));
         cpu.step();
         assertEquals("A", 0x10, cpu.A());
         assertEquals("O", 0x0, cpu.O());
         assertEquals("PC", 0xA, cpu.PC());
 
         // SET I, 10 ; a861
+        assertEquals("SET I, 0xA", DCPU16Utilities.disassemble(memory, cpu.PC()));
         cpu.step();
         assertEquals("I", 0xA, cpu.I());
         assertEquals("O", 0x0, cpu.O());
         assertEquals("PC", 0xB, cpu.PC());
 
         // SET A, 0x2000 ; 7c01 2000
+        assertEquals("SET A, 0x2000", DCPU16Utilities.disassemble(memory, cpu.PC()));
         cpu.step();
         assertEquals("A", 0x2000, cpu.A());
         assertEquals("O", 0x0, cpu.O());
         assertEquals("PC", 0xD, cpu.PC());
 
         // SET [0x2000+I], [A] ; 2161 2000
+        assertEquals("SET [0x2000+I], [A]", DCPU16Utilities.disassemble(memory, cpu.PC()));
         cpu.step();
         assertEquals("memory", memory[cpu.A()], memory[0x2000 + 0xA]);
         assertEquals("O", 0x0, cpu.O());
         assertEquals("PC", 0xF, cpu.PC());
 
         // SUB I, 1 ; 8463
+        assertEquals("SUB I, 0x1", DCPU16Utilities.disassemble(memory, cpu.PC()));
         cpu.step();
         assertEquals("I", 0x9, cpu.I());
         assertEquals("O", 0x0, cpu.O());
@@ -176,7 +185,9 @@ public class DCPU16Test {
 
         // IFN I, 0        ; 806d
         //    SET PC, loop ; 7dc1 000d [*]
+        assertEquals("IFN I, 0x0", DCPU16Utilities.disassemble(memory, cpu.PC()));
         cpu.step();
+        assertEquals("SET PC, 0x000D", DCPU16Utilities.disassemble(memory, cpu.PC()));
         cpu.step();
         assertEquals("I", 0x9, cpu.I());
         assertEquals("O", 0x0, cpu.O());
@@ -192,26 +203,32 @@ public class DCPU16Test {
         assertEquals("PC", 0x13, cpu.PC());
 
         // SET X, 0x4 ; 9031
+        assertEquals("SET X, 0x4", DCPU16Utilities.disassemble(memory, cpu.PC()));
         cpu.step();
         assertEquals("X", 0x4, cpu.X());
 
         // JSR testsub ; 7c10 0018
+        assertEquals("JSR 0x0018", DCPU16Utilities.disassemble(memory, cpu.PC()));
         cpu.step();
         assertEquals("PC", 0x18, cpu.PC());
 
         // SHL X, 4 ; 9037
+        assertEquals("SHL X, 0x4", DCPU16Utilities.disassemble(memory, cpu.PC()));
         cpu.step();
         assertEquals("X", 0x40, cpu.X());
 
         // SET PC, POP ; 61c1
+        assertEquals("SET PC, POP", DCPU16Utilities.disassemble(memory, cpu.PC()));
         cpu.step();
         assertEquals("PC", 0x16, cpu.PC());
 
         // SET PC, crash ; 7dc1 001a
+        assertEquals("SET PC, 0x001A", DCPU16Utilities.disassemble(memory, cpu.PC()));
         cpu.step();
         assertEquals("PC", 0x1A, cpu.PC());
 
         // SET PC, crash ; 7dc1 001a
+        assertEquals("SET PC, 0x001A", DCPU16Utilities.disassemble(memory, cpu.PC()));
         cpu.step();
         assertEquals("PC", 0x1A, cpu.PC());
     }

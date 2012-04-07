@@ -30,8 +30,8 @@ package com.stackframe.pattymelt;
 /**
  * Utilities for dealing with the DCPU16 architecture.
  *
- * This was derived from the disassembler in Brian Swetland's DCPU-16
- * implementation.
+ * The disassembler functionality was derived from the disassembler in Brian
+ * Swetland's DCPU-16 implementation.
  *
  * @author mcculley
  */
@@ -50,18 +50,20 @@ public class DCPU16Utilities {
      * @param memory the memory of the virtual machine
      * @param pc the PC of the instruction
      * @param operand the operand to disassemble
-     * @param buf a StringBuilder into which the disassembled operand will be written
-     * @return the PC of the next instruction, if the operand implies PC should be modified
+     * @param buf a StringBuilder into which the disassembled operand will be
+     * written
+     * @return the PC of the next instruction, if the operand implies PC should
+     * be modified
      */
-    private static int disassembleOperand(short[] memory, int pc, int operand, StringBuilder buf) {
+    private static int disassembleOperand(short[] memory, int pc, short operand, StringBuilder buf) {
         if (operand < 0x08) {
             buf.append(String.format("%c", regs.charAt(operand & 7)));
         } else if (operand < 0x10) {
             buf.append(String.format("[%c]", regs.charAt(operand & 7)));
         } else if (operand < 0x18) {
-            buf.append(String.format("[0x%04x+%c]", memory[pc++], regs.charAt(operand & 7)));
+            buf.append(String.format("[0x%04X+%c]", memory[pc++], regs.charAt(operand & 7)));
         } else if (operand > 0x1f) {
-            buf.append(String.format("%d", operand - 0x20));
+            buf.append(String.format("0x%X", operand - 0x20));
         } else {
             switch (operand) {
                 case 0x18:
@@ -83,10 +85,10 @@ public class DCPU16Utilities {
                     buf.append("O");
                     break;
                 case 0x1e:
-                    buf.append(String.format("[0x%04x]", memory[pc++]));
+                    buf.append(String.format("[0x%04X]", memory[pc++]));
                     break;
                 case 0x1f:
-                    buf.append(String.format("0x%04x", memory[pc++]));
+                    buf.append(String.format("0x%04X", memory[pc++]));
                     break;
             }
         }
@@ -98,15 +100,15 @@ public class DCPU16Utilities {
      * Disassemble a single instruction.
      *
      * @param memory the memory of the virtual machine
-     * @param pc the PC to disassemble at
-     * @buf a StringBuilder into which the disassembled instruction and operands will be written
+     * @param pc the PC to disassemble at @buf a StringBuilder into which the
+     * disassembled instruction and operands will be written
      * @return the PC incremented to the next instruction
      */
     public static int disassemble(short[] memory, int pc, StringBuilder buf) {
-        int n = memory[pc++];
+        short n = memory[pc++];
         int op = n & 0xF;
-        int a = (n >> 4) & 0x3F;
-        int b = (n >> 10);
+        short a = (short) ((n >> 4) & 0x3F);
+        short b = (short) ((n >> 10) & 0x3F);
         if (op > 0) {
             buf.append(String.format("%s ", opcode[op]));
             pc = disassembleOperand(memory, pc, a, buf);
@@ -121,7 +123,7 @@ public class DCPU16Utilities {
             return pc;
         }
 
-        buf.append(String.format("UNK[%02x] ", a));
+        buf.append(String.format("UNK[%02X] ", a));
         pc = disassembleOperand(memory, pc, b, buf);
         return pc;
     }
