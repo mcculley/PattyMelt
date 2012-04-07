@@ -105,7 +105,7 @@ public class StateViewer {
         pcField.setText(String.format("%04X", cpu.PC()));
         spField.setText(String.format("%04X", cpu.SP()));
         oField.setText(String.format("%04X", cpu.O()));
-        instrField.setText(String.format("%04X", cpu.memory()[cpu.PC()]));
+        instrField.setText(String.format("%04X", cpu.memory().get(cpu.PC())));
         disField.setText(DCPU16Utilities.disassemble(cpu.memory(), cpu.PC()));
         for (DCPU16.Register r : DCPU16.Register.values()) {
             JTextField registerField = registerFields[r.ordinal()];

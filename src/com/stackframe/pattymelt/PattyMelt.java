@@ -37,6 +37,7 @@ import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.ShortBuffer;
 import javax.swing.*;
 
 /**
@@ -53,7 +54,7 @@ public class PattyMelt {
      * @param file a File to read from
      * @throws IOException
      */
-    private static void loadBinary(short[] memory, File file) throws IOException {
+    private static void loadBinary(ShortBuffer memory, File file) throws IOException {
         int i = 0;
         InputStream inputStream = new FileInputStream(file);
         while (true) {
@@ -69,7 +70,7 @@ public class PattyMelt {
                 }
 
                 short value = (short) ((v2 << 8) | v1);
-                memory[i++] = value;
+                memory.put(i++, value);
             } catch (IOException ioe) {
                 inputStream.close();
                 throw ioe;
@@ -85,16 +86,16 @@ public class PattyMelt {
      * @param reader a BufferedReader to read from
      * @throws IOException
      */
-    private static void loadHex(short[] memory, BufferedReader reader) throws IOException {
+    private static void loadHex(ShortBuffer memory, BufferedReader reader) throws IOException {
         int i = 0;
         while (true) {
             String line = reader.readLine();
             if (line == null) {
                 return;
             }
-            
+
             short value = Short.parseShort(line, 16);
-            memory[i++] = value;
+            memory.put(i++, value);
         }
     }
 
@@ -135,7 +136,6 @@ public class PattyMelt {
 
         return buf.toString();
     }
-    
     private Console console;
     private StateViewer stateViewer;
     private final DCPU16 cpu = new DCPU16Emulator();
@@ -146,7 +146,7 @@ public class PattyMelt {
     private volatile boolean running;
 
     private void launch(String filename) throws Exception {
-        final short[] memory = cpu.memory();
+        final ShortBuffer memory = cpu.memory();
         File file = new File(filename);
 
         // Try to guess if this is binary or not. Should add an option to be explicit.

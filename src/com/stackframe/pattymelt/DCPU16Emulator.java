@@ -27,6 +27,8 @@
  */
 package com.stackframe.pattymelt;
 
+import java.nio.ShortBuffer;
+
 /**
  * An implementation of DPCU16 that is a simple emulator.
  *
@@ -64,8 +66,8 @@ public class DCPU16Emulator implements DCPU16 {
     }
 
     @Override
-    public synchronized short[] memory() {
-        return memory;
+    public synchronized ShortBuffer memory() {
+        return ShortBuffer.wrap(memory);
     }
 
     @Override

@@ -27,6 +27,7 @@
  */
 package com.stackframe.pattymelt;
 
+import java.nio.ShortBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.event.TableModelEvent;
@@ -40,11 +41,11 @@ import javax.swing.table.TableModel;
  */
 public class MemoryTableModel implements TableModel {
 
-    private final short[] memory;
+    private final ShortBuffer memory;
     private final List<TableModelListener> listeners = new ArrayList<TableModelListener>();
     private static final int columns = 8;
 
-    public MemoryTableModel(short[] memory) {
+    public MemoryTableModel(ShortBuffer memory) {
         this.memory = memory;
     }
 
@@ -92,7 +93,7 @@ public class MemoryTableModel implements TableModel {
             int address = rowIndex * columns;
             StringBuilder buf = new StringBuilder();
             for (int i = 0; i < columns; i++) {
-                short value = memory[address + i];
+                short value = memory.get(address + i);
                 char c = (char) (value & 0x7F);
                 if (c < 0x20 || c > 0x7e) {
                     c = '.';
@@ -105,7 +106,7 @@ public class MemoryTableModel implements TableModel {
         } else {
             columnIndex--;
             int address = rowIndex * columns + columnIndex;
-            short value = memory[address];
+            short value = memory.get(address);
             return String.format("%04X", value);
         }
     }

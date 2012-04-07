@@ -27,7 +27,7 @@
  */
 package com.stackframe.pattymelt;
 
-import com.stackframe.pattymelt.DCPU16.Register;
+import java.nio.ShortBuffer;
 import org.junit.*;
 import static org.junit.Assert.*;
 
@@ -64,9 +64,9 @@ public class DCPU16Test {
     public void initialStateTest() {
         System.out.println("Testing initial state.");
         DCPU16 cpu = new DCPU16Emulator();
-        short[] memory = cpu.memory();
+        ShortBuffer memory = cpu.memory();
         for (int i = 0; i < 0x10000; i++) {
-            assertEquals("memory at " + i, 0, memory[i]);
+            assertEquals("memory at " + i, 0, memory.get(i));
         }
 
         for (DCPU16.Register r : DCPU16.Register.values()) {
@@ -119,9 +119,9 @@ public class DCPU16Test {
             0x0000,
             0x0000
         };
-        short[] memory = cpu.memory();
+        ShortBuffer memory = cpu.memory();
         for (int i = 0; i < program.length; i++) {
-            memory[i] = (short) program[i];
+            memory.put(i,(short)program[i]);
         }
 
         // SET A, 0x30 ; 7c01 0030
@@ -134,7 +134,7 @@ public class DCPU16Test {
         // SET [0x1000], 0x20 ; 7de1 1000 0020
         assertEquals("SET [0x1000], 0x0020", DCPU16Utilities.disassemble(memory, cpu.PC()));
         cpu.step();
-        assertEquals("memory", 0x20, memory[0x1000]);
+        assertEquals("memory", 0x20, memory.get(0x1000));
         assertEquals("O", 0x0, cpu.O());
         assertEquals("PC", 0x5, cpu.PC());
 
@@ -172,7 +172,7 @@ public class DCPU16Test {
         // SET [0x2000+I], [A] ; 2161 2000
         assertEquals("SET [0x2000+I], [A]", DCPU16Utilities.disassemble(memory, cpu.PC()));
         cpu.step();
-        assertEquals("memory", memory[cpu.A()], memory[0x2000 + 0xA]);
+        assertEquals("memory", memory.get(cpu.A()), memory.get(0x2000 + 0xA));
         assertEquals("O", 0x0, cpu.O());
         assertEquals("PC", 0xF, cpu.PC());
 

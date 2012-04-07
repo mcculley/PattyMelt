@@ -27,6 +27,8 @@
  */
 package com.stackframe.pattymelt;
 
+import java.nio.ShortBuffer;
+
 /**
  * An abstraction for the DCPU-16 virtual machine.
  *
@@ -170,9 +172,9 @@ public interface DCPU16 extends Runnable {
     void step() throws IllegalOpcodeException;
 
     /**
-     * Get an array that represents the memory.
+     * Get a buffer that represents the memory.
      *
-     * @return an array that represents the memory.
+     * @return a buffer that represents the memory.
      */
-    short[] memory();
+    ShortBuffer memory();
 }

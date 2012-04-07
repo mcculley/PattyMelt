@@ -28,6 +28,7 @@
 package com.stackframe.pattymelt;
 
 import java.awt.Font;
+import java.nio.ShortBuffer;
 import javax.swing.JComponent;
 import javax.swing.JTextArea;
 
@@ -40,11 +41,11 @@ public class Console {
 
     // FIXME: Add keyboard support
     private final int address;
-    private final short[] memory;
+    private final ShortBuffer memory;
     private final JTextArea textArea;
     private static final int numRows = 16, numColumns = 32, grid = numRows * numColumns;
 
-    public Console(int address, short[] memory) {
+    public Console(int address, ShortBuffer memory) {
         this.address = address;
         this.memory = memory;
         textArea = new JTextArea(numRows, numColumns);
@@ -58,7 +59,7 @@ public class Console {
     public void update() {
         StringBuilder buf = new StringBuilder();
         for (int i = 0, col = 0; i < grid; i++, col++) {
-            short word = memory[address + i];
+            short word = memory.get(address + i);
             if (word != 0) {
                 char c = (char) (word & 0x7f);
                 int attributes = (word >> 7) & 0x1ff;

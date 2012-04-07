@@ -27,6 +27,8 @@
  */
 package com.stackframe.pattymelt;
 
+import java.nio.ShortBuffer;
+
 /**
  * Utilities for dealing with the DCPU16 architecture.
  *
@@ -51,13 +53,13 @@ public class DCPU16Utilities {
      * @return the PC of the next instruction, if the operand implies PC should
      * be modified
      */
-    private static int disassembleOperand(short[] memory, int pc, short operand, StringBuilder buf) {
+    private static int disassembleOperand(ShortBuffer memory, int pc, short operand, StringBuilder buf) {
         if (operand < 0x08) {
             buf.append(String.format("%c", DCPU16.Register.name(operand & 7)));
         } else if (operand < 0x10) {
             buf.append(String.format("[%c]", DCPU16.Register.name(operand & 7)));
         } else if (operand < 0x18) {
-            buf.append(String.format("[0x%04X+%c]", memory[pc++], DCPU16.Register.name(operand & 7)));
+            buf.append(String.format("[0x%04X+%c]", memory.get(pc++), DCPU16.Register.name(operand & 7)));
         } else if (operand > 0x1f) {
             buf.append(String.format("0x%X", operand - 0x20));
         } else {
@@ -81,10 +83,10 @@ public class DCPU16Utilities {
                     buf.append("O");
                     break;
                 case 0x1e:
-                    buf.append(String.format("[0x%04X]", memory[pc++]));
+                    buf.append(String.format("[0x%04X]", memory.get(pc++)));
                     break;
                 case 0x1f:
-                    buf.append(String.format("0x%04X", memory[pc++]));
+                    buf.append(String.format("0x%04X", memory.get(pc++)));
                     break;
             }
         }
@@ -100,8 +102,8 @@ public class DCPU16Utilities {
      * disassembled instruction and operands will be written
      * @return the PC incremented to the next instruction
      */
-    public static int disassemble(short[] memory, int pc, StringBuilder buf) {
-        short n = memory[pc++];
+    public static int disassemble(ShortBuffer memory, int pc, StringBuilder buf) {
+        short n = memory.get(pc++);
         int op = n & 0xF;
         short a = (short) ((n >> 4) & 0x3F);
         short b = (short) ((n >> 10) & 0x3F);
@@ -131,7 +133,7 @@ public class DCPU16Utilities {
      * @param pc the PC to disassemble at
      * @return a String with the disassembled instruction and operands
      */
-    public static String disassemble(short[] memory, int pc) {
+    public static String disassemble(ShortBuffer memory, int pc) {
         StringBuilder buf = new StringBuilder();
         disassemble(memory, pc, buf);
         return buf.toString();
