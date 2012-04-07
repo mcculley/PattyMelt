@@ -281,6 +281,10 @@ public class PattyMelt {
      * @param args the command line arguments
      */
     public static void main(String[] args) throws Exception {
+        if (args == null || args.length == 0) {
+            System.err.println("This application requires a hex or binary file as input!");
+            return;
+        }
         PattyMelt application = new PattyMelt();
         String filename = args[0];
         application.launch(filename);
