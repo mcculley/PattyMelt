@@ -37,6 +37,8 @@ import javax.swing.*;
  */
 public class StateViewer {
 
+    private static final Font MONO = new Font("Monospaced", Font.PLAIN, 12);
+
     // FIXME: Add a field to show the decoded instruction
     // FIXME: Add ability to adjust registers
     private final DCPU16 cpu;
@@ -51,7 +53,7 @@ public class StateViewer {
     private static JTextField makeField(int numColumns) {
         JTextField field = new JTextField(numColumns);
         field.setEditable(false);
-        field.setFont(Font.getFont(Font.MONOSPACED));
+        field.setFont(MONO);
         return field;
     }
 

@@ -38,7 +38,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import javax.swing.*;
-import javax.swing.table.DefaultTableCellRenderer;
 
 /**
  * A simple command line driver for DCPU-16.
@@ -55,22 +54,26 @@ public class PattyMelt {
      * @throws IOException
      */
     private static void loadBinary(short[] memory, File file) throws IOException {
-        // FIXME: Close streams correctly.
         int i = 0;
         InputStream inputStream = new FileInputStream(file);
         while (true) {
-            int v1 = inputStream.read();
-            if (v1 == -1) {
-                return;
-            }
+            try {
+                int v1 = inputStream.read();
+                if (v1 == -1) {
+                    return;
+                }
 
-            int v2 = inputStream.read();
-            if (v2 == -1) {
-                return;
-            }
+                int v2 = inputStream.read();
+                if (v2 == -1) {
+                    return;
+                }
 
-            short value = (short) ((v2 << 8) | v1);
-            memory[i++] = value;
+                short value = (short) ((v2 << 8) | v1);
+                memory[i++] = value;
+            } catch (IOException ioe) {
+                inputStream.close();
+                throw ioe;
+            }
         }
     }
 
@@ -83,33 +86,36 @@ public class PattyMelt {
      * @throws IOException
      */
     private static void loadHex(short[] memory, BufferedReader reader) throws IOException {
-        // FIXME: Close streams correctly.
         int i = 0;
         while (true) {
             String line = reader.readLine();
             if (line == null) {
                 return;
             }
-
-            short value = (short) Integer.parseInt(line, 16);
+            
+            short value = Short.parseShort(line, 16);
             memory[i++] = value;
         }
     }
 
     private static boolean isBinary(File file) throws IOException {
-        // FIXME: Close streams correctly.
         InputStream inputStream = new FileInputStream(file);
         while (true) {
-            int value = inputStream.read();
-            if (value == -1) {
-                return false;
-            }
+            try {
+                int value = inputStream.read();
+                if (value == -1) {
+                    return false;
+                }
 
-            char c = (char) value;
-            boolean isLetterOrDigit = Character.isLetterOrDigit(c);
-            boolean isWhitespace = Character.isWhitespace(c);
-            if (!(isLetterOrDigit || isWhitespace)) {
-                return true;
+                char c = (char) value;
+                boolean isLetterOrDigit = Character.isLetterOrDigit(c);
+                boolean isWhitespace = Character.isWhitespace(c);
+                if (!(isLetterOrDigit || isWhitespace)) {
+                    return true;
+                }
+            } catch (IOException ioe) {
+                inputStream.close();
+                throw ioe;
             }
         }
     }
@@ -129,6 +135,7 @@ public class PattyMelt {
 
         return buf.toString();
     }
+    
     private Console console;
     private StateViewer stateViewer;
     private final DCPU16 cpu = new DCPU16Emulator();
@@ -140,16 +147,19 @@ public class PattyMelt {
 
     private void launch(String filename) throws Exception {
         final short[] memory = cpu.memory();
-        System.err.println("Loading " + filename);
         File file = new File(filename);
 
         // Try to guess if this is binary or not. Should add an option to be explicit.
         if (isBinary(file)) {
             loadBinary(memory, file);
         } else {
-            // FIXME: Close streams correctly.
             BufferedReader reader = new BufferedReader(new FileReader(filename));
-            loadHex(memory, reader);
+            try {
+                loadHex(memory, reader);
+            } catch (IOException ioe) {
+                reader.close();
+                throw ioe;
+            }
         }
 
         SwingUtilities.invokeAndWait(new Runnable() {
@@ -224,13 +234,11 @@ public class PattyMelt {
 
                 JFrame memoryFrame = new JFrame("Memory");
                 JTable memoryTable = new JTable(memoryTableModel);
-                memoryTable.setFont(Font.getFont(Font.MONOSPACED));
+                memoryTable.setFont(new Font("Monospaced", Font.PLAIN, 18));
                 memoryTable.getTableHeader().setReorderingAllowed(false);
-                // FIXME: How the heck do I force the table cells to be rendered in a monospaced font?
-                ((DefaultTableCellRenderer) memoryTable.getDefaultRenderer(String.class)).setFont(Font.getFont(Font.MONOSPACED));
                 memoryFrame.getContentPane().add(new JScrollPane(memoryTable));
-                memoryFrame.setSize(600, 200);
-                memoryFrame.setLocation(200, 300);
+                memoryFrame.setSize(1000, 200);
+                memoryFrame.setLocation(0, 250);
                 memoryFrame.setVisible(true);
             }
         });
@@ -283,6 +291,10 @@ public class PattyMelt {
      * @param args the command line arguments
      */
     public static void main(String[] args) throws Exception {
+        if (args == null || args.length == 0) {
+            System.err.println("This application requires a hex or binary file as input!");
+            return;
+        }
         PattyMelt application = new PattyMelt();
         String filename = args[0];
         application.launch(filename);
