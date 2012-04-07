@@ -48,7 +48,7 @@ public class Console {
         this.address = address;
         this.memory = memory;
         textArea = new JTextArea(numRows, numColumns);
-        textArea.setFont(Font.getFont(Font.MONOSPACED));
+        textArea.setFont(new Font("Monospaced", Font.PLAIN, 18));
     }
 
     public JComponent getWidget() {

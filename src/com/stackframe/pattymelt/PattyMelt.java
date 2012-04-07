@@ -168,7 +168,7 @@ public class PattyMelt {
             public void run() {
                 console = new Console(0x8000, memory);
                 JFrame frame = new JFrame("PattyMelt");
-                frame.setSize(240, 240);
+                frame.setSize(342, 330);
                 frame.getContentPane().add(console.getWidget());
                 frame.setVisible(true);
 
