@@ -232,16 +232,28 @@ public class PattyMelt {
                 stateFrame.setLocation(0, 100);
                 stateFrame.setVisible(true);
 
-                JFrame memoryFrame = new JFrame("Memory");
-                JTable memoryTable = new JTable(memoryTableModel);
-                memoryTable.setFont(new Font("Monospaced", Font.PLAIN, 18));
-                memoryTable.getTableHeader().setReorderingAllowed(false);
-                memoryFrame.getContentPane().add(new JScrollPane(memoryTable));
-                memoryFrame.setSize(1000, 200);
-                memoryFrame.setLocation(0, 250);
-                memoryFrame.setVisible(true);
+                openMemoryViewer();
             }
         });
+    }
+
+    private void openMemoryViewer() {
+        JFrame memoryFrame = new JFrame("Memory");
+        JTable memoryTable = new JTable(memoryTableModel);
+        memoryTable.setFont(new Font("Monospaced", Font.PLAIN, 18));
+        
+        // FIXME: This is hokey. Doing this here breaks the encapsulation of MemoryTableModel.
+        memoryTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        for (int i = 0; i < 9; i++) {
+            memoryTable.getColumnModel().getColumn(i).setPreferredWidth(48);
+        }
+
+        memoryTable.getColumnModel().getColumn(9).setPreferredWidth(95);
+        memoryTable.getTableHeader().setReorderingAllowed(false);
+        memoryFrame.getContentPane().add(new JScrollPane(memoryTable));
+        memoryFrame.setSize(548, 200);
+        memoryFrame.setLocation(0, 250);
+        memoryFrame.setVisible(true);
     }
 
     private void runCPU() {
