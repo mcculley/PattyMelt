@@ -36,7 +36,11 @@ public interface DCPU16 extends Runnable {
 
     public enum Register {
 
-        A, B, C, X, Y, Z, I, J
+        A, B, C, X, Y, Z, I, J;
+
+        public static char name(int n) {
+            return values()[n].name().charAt(0);
+        }
     }
 
     public enum Opcode {

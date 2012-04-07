@@ -53,11 +53,11 @@ public class DCPU16Utilities {
      */
     private static int disassembleOperand(short[] memory, int pc, short operand, StringBuilder buf) {
         if (operand < 0x08) {
-            buf.append(String.format("%c", DCPU16.Register.values()[operand & 7].name().charAt(0)));
+            buf.append(String.format("%c", DCPU16.Register.name(operand & 7)));
         } else if (operand < 0x10) {
-            buf.append(String.format("[%c]", DCPU16.Register.values()[operand & 7].name().charAt(0)));
+            buf.append(String.format("[%c]", DCPU16.Register.name(operand & 7)));
         } else if (operand < 0x18) {
-            buf.append(String.format("[0x%04X+%c]", memory[pc++], DCPU16.Register.values()[operand & 7].name().charAt(0)));
+            buf.append(String.format("[0x%04X+%c]", memory[pc++], DCPU16.Register.name(operand & 7)));
         } else if (operand > 0x1f) {
             buf.append(String.format("0x%X", operand - 0x20));
         } else {
