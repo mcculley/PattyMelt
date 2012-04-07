@@ -41,6 +41,7 @@ import javax.swing.table.TableModel;
  */
 public class MemoryTableModel implements TableModel {
 
+    // FIXME: Add a column for a disassembled view? Or make that a separate window?
     private final Memory memory;
     private final List<TableModelListener> listeners = new ArrayList<TableModelListener>();
     private static final int columns = 8;
@@ -54,7 +55,10 @@ public class MemoryTableModel implements TableModel {
 
             @Override
             public void memoryModified(CPUEvent event) {
-                update();
+                for (TableModelListener l : listeners) {
+                    // FIXME: Notify about single cell
+                    l.tableChanged(new TableModelEvent(MemoryTableModel.this));
+                }
             }
         });
         this.memory = cpu.memory();
@@ -93,7 +97,7 @@ public class MemoryTableModel implements TableModel {
 
     @Override
     public int getRowCount() {
-        return 65536 / columns;
+        return memory.size() / columns;
     }
 
     @Override
@@ -135,11 +139,5 @@ public class MemoryTableModel implements TableModel {
     @Override
     public void setValueAt(Object o, int i, int i1) {
         throw new UnsupportedOperationException("Not supported.");
-    }
-
-    public void update() {
-        for (TableModelListener l : listeners) {
-            l.tableChanged(new TableModelEvent(this));
-        }
     }
 }
