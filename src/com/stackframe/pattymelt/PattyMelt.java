@@ -249,7 +249,6 @@ public class PattyMelt {
 
     private void updatePeripheralsInSwingThread() {
         assert SwingUtilities.isEventDispatchThread();
-        console.update();
         stateViewer.update();
         memoryTableModel.update();
     }

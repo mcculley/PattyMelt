@@ -31,6 +31,7 @@ import java.awt.Font;
 import java.nio.ShortBuffer;
 import javax.swing.JComponent;
 import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
 
 /**
  * A console for DCPU-16.
@@ -40,7 +41,14 @@ import javax.swing.JTextArea;
 public class Console {
 
     // FIXME: Add keyboard support
-    private final ArrayMemory textRAM = new ArrayMemory(grid);
+    private final ArrayMemory textRAM = new ArrayMemory(grid) {
+
+        @Override
+        public void put(int address, short value) {
+            super.put(address, value);
+            update();
+        }
+    };
     private final JTextArea textArea;
     private static final int numRows = 16, numColumns = 32, grid = numRows * numColumns;
     private final Peripheral screen = new Peripheral() {
@@ -65,8 +73,8 @@ public class Console {
         return textArea;
     }
 
-    public void update() {
-        StringBuilder buf = new StringBuilder();
+    private void update() {
+        final StringBuilder buf = new StringBuilder();
         for (int i = 0, col = 0; i < grid; i++, col++) {
             short word = textRAM.get(i);
             if (word != 0) {
@@ -84,7 +92,17 @@ public class Console {
             }
         }
 
-        textArea.setText(buf.toString());
+        try {
+            SwingUtilities.invokeAndWait(new Runnable() {
+
+                @Override
+                public void run() {
+                    textArea.setText(buf.toString());
+                }
+            });
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public Peripheral getScreen() {
