@@ -230,7 +230,7 @@ public class PattyMelt {
                 ((DefaultTableCellRenderer)memoryTable.getDefaultRenderer(String.class)).setFont(Font.getFont(Font.MONOSPACED));
                 memoryFrame.getContentPane().add(new JScrollPane(memoryTable));
                 memoryFrame.setSize(600, 200);
-                memoryFrame.setLocation(200, 300);
+                memoryFrame.setLocation(0, 250);
                 memoryFrame.setVisible(true);
             }
         });
