@@ -38,7 +38,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import javax.swing.*;
-import javax.swing.table.DefaultTableCellRenderer;
 
 /**
  * A simple command line driver for DCPU-16.
@@ -55,22 +54,26 @@ public class PattyMelt {
      * @throws IOException
      */
     private static void loadBinary(short[] memory, File file) throws IOException {
-        // FIXME: Close streams correctly.
         int i = 0;
         InputStream inputStream = new FileInputStream(file);
         while (true) {
-            int v1 = inputStream.read();
-            if (v1 == -1) {
-                return;
+            try {
+                int v1 = inputStream.read();
+                if (v1 == -1) {
+                    return;
+                }
+
+                int v2 = inputStream.read();
+                if (v2 == -1) {
+                    return;
+                }
+
+                short value = (short) ((v2 << 8) | v1);
+                memory[i++] = value;
+            } catch (IOException ioe) {
+                inputStream.close();
+                throw ioe;
             }
-            
-            int v2 = inputStream.read();
-            if (v2 == -1) {
-                return;
-            }
-            
-            short value = (short) ((v2 << 8) | v1);
-            memory[i++] = value;
         }
     }
 
@@ -83,7 +86,6 @@ public class PattyMelt {
      * @throws IOException
      */
     private static void loadHex(short[] memory, BufferedReader reader) throws IOException {
-        // FIXME: Close streams correctly.
         int i = 0;
         while (true) {
             String line = reader.readLine();
@@ -91,7 +93,7 @@ public class PattyMelt {
                 return;
             }
             
-            short value = (short) Integer.parseInt(line, 16);
+            short value = Short.parseShort(line, 16);
             memory[i++] = value;
         }
     }
@@ -129,6 +131,7 @@ public class PattyMelt {
         
         return buf.toString();
     }
+    
     private Console console;
     private StateViewer stateViewer;
     private final DCPU16 cpu = new DCPU16Emulator();
@@ -140,16 +143,19 @@ public class PattyMelt {
     
     private void launch(String filename) throws Exception {
         final short[] memory = cpu.memory();
-        System.err.println("Loading " + filename);
         File file = new File(filename);
 
         // Try to guess if this is binary or not. Should add an option to be explicit.
         if (isBinary(file)) {
             loadBinary(memory, file);
         } else {
-            // FIXME: Close streams correctly.
             BufferedReader reader = new BufferedReader(new FileReader(filename));
-            loadHex(memory, reader);
+            try {
+                loadHex(memory, reader);
+            } catch (IOException ioe) {
+                reader.close();
+                throw ioe;
+            }
         }
         
         SwingUtilities.invokeAndWait(new Runnable() {
