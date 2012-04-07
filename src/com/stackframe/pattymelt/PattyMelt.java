@@ -99,19 +99,23 @@ public class PattyMelt {
     }
     
     private static boolean isBinary(File file) throws IOException {
-        // FIXME: Close streams correctly.
         InputStream inputStream = new FileInputStream(file);
         while (true) {
-            int value = inputStream.read();
-            if (value == -1) {
-                return false;
-            }
-            
-            char c = (char) value;
-            boolean isLetterOrDigit = Character.isLetterOrDigit(c);
-            boolean isWhitespace = Character.isWhitespace(c);
-            if (!(isLetterOrDigit || isWhitespace)) {
-                return true;
+            try {
+                int value = inputStream.read();
+                if (value == -1) {
+                    return false;
+                }
+
+                char c = (char) value;
+                boolean isLetterOrDigit = Character.isLetterOrDigit(c);
+                boolean isWhitespace = Character.isWhitespace(c);
+                if (!(isLetterOrDigit || isWhitespace)) {
+                    return true;
+                }
+            } catch (IOException ioe) {
+                inputStream.close();
+                throw ioe;
             }
         }
     }
