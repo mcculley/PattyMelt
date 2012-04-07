@@ -27,6 +27,7 @@
  */
 package com.stackframe.pattymelt;
 
+import com.stackframe.pattymelt.DCPU16.CPUEvent;
 import java.awt.Font;
 import javax.swing.*;
 
@@ -38,7 +39,6 @@ import javax.swing.*;
 public class StateViewer {
 
     private static final Font MONO = new Font("Monospaced", Font.PLAIN, 12);
-
     // FIXME: Add a field to show the decoded instruction
     // FIXME: Add ability to adjust registers
     private final DCPU16 cpu;
@@ -95,6 +95,28 @@ public class StateViewer {
             registerBox.add(registerField);
             registerFields[r.ordinal()] = registerField;
         }
+
+        cpu.addListener(new DCPU16.CPUEventListener() {
+
+            @Override
+            public void instructionExecuted(CPUEvent event) {
+                if (SwingUtilities.isEventDispatchThread()) {
+                    update();
+                } else {
+                    try {
+                        SwingUtilities.invokeAndWait(new Runnable() {
+
+                            @Override
+                            public void run() {
+                                update();
+                            }
+                        });
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
+        });
     }
 
     public JComponent getWidget() {

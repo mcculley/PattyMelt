@@ -27,7 +27,9 @@
  */
 package com.stackframe.pattymelt;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -61,6 +63,7 @@ public class DCPU16Emulator implements DCPU16 {
     private final int PC = 0x10009;
     private final int O = 0x1000A;
     private final Map<Integer, Peripheral> peripherals = new HashMap<Integer, Peripheral>();
+    private final List<CPUEventListener> listeners = new ArrayList<CPUEventListener>();
 
     private Peripheral findPeripheral(int address, int mountPoint[]) {
         for (Entry<Integer, Peripheral> entry : peripherals.entrySet()) {
@@ -253,7 +256,15 @@ public class DCPU16Emulator implements DCPU16 {
     }
 
     @Override
-    public synchronized void step() throws IllegalOpcodeException {
+    public void step() throws IllegalOpcodeException {
+        stepActual();
+        CPUEvent event = new CPUEvent(this);
+        for (CPUEventListener listener : listeners) {
+            listener.instructionExecuted(event);
+        }
+    }
+
+    private synchronized void stepActual() throws IllegalOpcodeException {
         int pc = PC() & 0xffff;
         short op = memoryManager.get(pc);
         PC((short) (PC() + 1));
@@ -411,5 +422,15 @@ public class DCPU16Emulator implements DCPU16 {
                 throw new RuntimeException(ioe);
             }
         }
+    }
+
+    @Override
+    public void addListener(CPUEventListener l) {
+        listeners.add(l);
+    }
+
+    @Override
+    public void removeListener(CPUEventListener l) {
+        listeners.remove(l);
     }
 }

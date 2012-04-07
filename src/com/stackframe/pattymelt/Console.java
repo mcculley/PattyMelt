@@ -74,7 +74,25 @@ public class Console {
     }
 
     private void update() {
-        final StringBuilder buf = new StringBuilder();
+        if (SwingUtilities.isEventDispatchThread()) {
+            updateOnSwingThread();
+        } else {
+            try {
+                SwingUtilities.invokeAndWait(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        updateOnSwingThread();
+                    }
+                });
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    private void updateOnSwingThread() {
+        StringBuilder buf = new StringBuilder();
         for (int i = 0, col = 0; i < grid; i++, col++) {
             short word = textRAM.get(i);
             if (word != 0) {
@@ -91,18 +109,8 @@ public class Console {
                 col = 0;
             }
         }
+        textArea.setText(buf.toString());
 
-        try {
-            SwingUtilities.invokeAndWait(new Runnable() {
-
-                @Override
-                public void run() {
-                    textArea.setText(buf.toString());
-                }
-            });
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
     }
 
     public Peripheral getScreen() {

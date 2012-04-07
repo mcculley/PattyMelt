@@ -37,7 +37,6 @@ import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.ShortBuffer;
 import javax.swing.*;
 
 /**
@@ -249,7 +248,6 @@ public class PattyMelt {
 
     private void updatePeripheralsInSwingThread() {
         assert SwingUtilities.isEventDispatchThread();
-        stateViewer.update();
         memoryTableModel.update();
     }
 
