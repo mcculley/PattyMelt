@@ -39,10 +39,6 @@ public class DCPU16Utilities {
 
     private DCPU16Utilities() {
     }
-    private static final String opcode[] = {
-        "XXX", "SET", "ADD", "SUB", "MUL", "DIV", "MOD", "SHL",
-        "SHR", "AND", "BOR", "XOR", "IFE", "IFN", "IFG", "IFB",};
-    private static final String regs = "ABCXYZIJ";
 
     /**
      * Decode the operand of an instruction.
@@ -57,11 +53,11 @@ public class DCPU16Utilities {
      */
     private static int disassembleOperand(short[] memory, int pc, short operand, StringBuilder buf) {
         if (operand < 0x08) {
-            buf.append(String.format("%c", regs.charAt(operand & 7)));
+            buf.append(String.format("%c", DCPU16.Register.values()[operand & 7].name().charAt(0)));
         } else if (operand < 0x10) {
-            buf.append(String.format("[%c]", regs.charAt(operand & 7)));
+            buf.append(String.format("[%c]", DCPU16.Register.values()[operand & 7].name().charAt(0)));
         } else if (operand < 0x18) {
-            buf.append(String.format("[0x%04X+%c]", memory[pc++], regs.charAt(operand & 7)));
+            buf.append(String.format("[0x%04X+%c]", memory[pc++], DCPU16.Register.values()[operand & 7].name().charAt(0)));
         } else if (operand > 0x1f) {
             buf.append(String.format("0x%X", operand - 0x20));
         } else {
@@ -110,7 +106,7 @@ public class DCPU16Utilities {
         short a = (short) ((n >> 4) & 0x3F);
         short b = (short) ((n >> 10) & 0x3F);
         if (op > 0) {
-            buf.append(String.format("%s ", opcode[op]));
+            buf.append(String.format("%s ", DCPU16.Opcode.values()[op]));
             pc = disassembleOperand(memory, pc, a, buf);
             buf.append(", ");
             pc = disassembleOperand(memory, pc, b, buf);
