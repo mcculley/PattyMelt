@@ -123,7 +123,7 @@ public class StateViewer {
         return box;
     }
 
-    public void update() {
+    private void update() {
         pcField.setText(String.format("%04X", cpu.PC()));
         spField.setText(String.format("%04X", cpu.SP()));
         oField.setText(String.format("%04X", cpu.O()));
