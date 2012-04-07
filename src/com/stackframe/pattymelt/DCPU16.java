@@ -192,8 +192,27 @@ public interface DCPU16 extends Runnable {
      */
     static class CPUEvent extends EventObject {
 
+        public final int addressOfMemoryModification;
+
+        /**
+         * Create a general CPUEvent.
+         *
+         * @param source the source of the event
+         */
         public CPUEvent(DCPU16 source) {
             super(source);
+            this.addressOfMemoryModification = -1;
+        }
+
+        /**
+         * Create a general CPUEvent about a memory modification.
+         *
+         * @param source the source of the event
+         * @param addressOfMemoryModification the address of memory that was modified
+         */
+        public CPUEvent(DCPU16 source, int addressOfMemoryModification) {
+            super(source);
+            this.addressOfMemoryModification = addressOfMemoryModification;
         }
     }
 

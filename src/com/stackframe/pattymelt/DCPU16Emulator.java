@@ -100,7 +100,7 @@ public class DCPU16Emulator implements DCPU16 {
                 memory[address] = value;
             }
 
-            CPUEvent event = new CPUEvent(DCPU16Emulator.this);
+            CPUEvent event = new CPUEvent(DCPU16Emulator.this, address);
             for (CPUEventListener listener : listeners) {
                 listener.memoryModified(event);
             }

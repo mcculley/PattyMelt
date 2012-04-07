@@ -56,8 +56,9 @@ public class MemoryTableModel implements TableModel {
             @Override
             public void memoryModified(CPUEvent event) {
                 for (TableModelListener l : listeners) {
-                    // FIXME: Notify about single cell
-                    l.tableChanged(new TableModelEvent(MemoryTableModel.this));
+                    int row = event.addressOfMemoryModification / columns;
+                    int column = event.addressOfMemoryModification % columns + 1;
+                    l.tableChanged(new TableModelEvent(MemoryTableModel.this, row, row, column));
                 }
             }
         });
