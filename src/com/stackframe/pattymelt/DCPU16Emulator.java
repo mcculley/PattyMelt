@@ -262,6 +262,7 @@ public class DCPU16Emulator implements DCPU16 {
 
     @Override
     public void step() throws IllegalOpcodeException {
+        // FIXME: Need to figure out if I should make this synchronized or move listener execution to another thread.
         stepActual();
         CPUEvent event = new CPUEvent(this);
         for (CPUEventListener listener : listeners) {
