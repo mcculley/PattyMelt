@@ -128,7 +128,7 @@ public class PattyMelt {
         }
     }
 
-    private void launch(final boolean openConsole, final boolean openStateViewer, final boolean openMemoryViewer, String filename) throws Exception {
+    private void launch(final boolean start, final boolean openConsole, final boolean openStateViewer, final boolean openMemoryViewer, String filename) throws Exception {
         final Memory memory = cpu.memory();
         File file = new File(filename);
 
@@ -162,6 +162,10 @@ public class PattyMelt {
                 }
             }
         });
+
+        if (start) {
+            launchCPUThread();
+        }
     }
 
     private void openConsole() {
@@ -285,6 +289,7 @@ public class PattyMelt {
         boolean openConsole = true;
         boolean openStateViewer = true;
         boolean openMemoryViewer = true;
+        boolean start = false;
         while (!argList.isEmpty()) {
             String arg = argList.removeFirst();
             if (arg.equals("-console")) {
@@ -299,16 +304,18 @@ public class PattyMelt {
                 openMemoryViewer = true;
             } else if (arg.equals("-nomemoryviewer")) {
                 openMemoryViewer = false;
+            } else if (arg.equals("-start")) {
+                start = true;
             } else {
                 filename = arg;
             }
         }
 
         if (filename == null) {
-            System.err.println("usage: [-console | -noconsole] [-stateviewer | -nostateviewer] [-memoryviewer | -nomemoryviewer] PattyMelt <hex or binary file>");
+            System.err.println("usage: [-start] [-[no]console] [-[no]stateviewer] [-[no]memoryviewer] PattyMelt <hex or binary file>");
         } else {
             PattyMelt application = new PattyMelt();
-            application.launch(openConsole, openStateViewer, openMemoryViewer, filename);
+            application.launch(start, openConsole, openStateViewer, openMemoryViewer, filename);
         }
     }
 }
