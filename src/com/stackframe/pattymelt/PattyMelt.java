@@ -29,10 +29,8 @@ package com.stackframe.pattymelt;
 
 import java.awt.BorderLayout;
 import java.awt.Font;
-import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.font.FontRenderContext;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -40,6 +38,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
 
 /**
@@ -248,25 +247,17 @@ public class PattyMelt {
         memoryFrame.getContentPane().add(new JScrollPane(memoryTable));
         memoryTable.setFont(font);
         memoryTable.getTableHeader().setFont(font);
-        memoryFrame.setSize(540, 200);
+        memoryFrame.pack();
         memoryFrame.setLocation(0, 250);
         memoryFrame.setVisible(true);
 
-        Graphics2D g = (Graphics2D) memoryTable.getGraphics();
-        FontRenderContext frc = g.getFontRenderContext();
-        int width = font.getStringBounds("0000", frc).getBounds().width;
-
-        // FIXME: This is hokey. Doing this here breaks the encapsulation of MemoryTableModel.
-        // FIXME: Also fix the alignment to be centered.
         memoryTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         for (int i = 0; i < 9; i++) {
+            DefaultTableCellRenderer dtcr = new DefaultTableCellRenderer();  
+            dtcr.setHorizontalAlignment(SwingConstants.CENTER);
             TableColumn column = memoryTable.getColumnModel().getColumn(i);
-            column.setPreferredWidth(width + 3); // FIXME: I have no idea why I have to add 3 pixels.
+            column.setCellRenderer(dtcr);
         }
-
-        // FIXME: This still looks like crap.
-        memoryTable.getColumnModel().getColumn(9).setPreferredWidth(width * 2 + 6); // FIXME: I have no idea why I have to add 6 pixels.
-        memoryTable.getTableHeader().setReorderingAllowed(false);
     }
 
     private void runCPU() {
