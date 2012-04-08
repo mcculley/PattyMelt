@@ -48,6 +48,10 @@ import javax.swing.table.TableColumn;
  */
 public class PattyMelt {
 
+    // FIXE: Add support for undoing/going back in time to debug.
+    private final DCPU16 cpu = new DCPU16Emulator();
+    private volatile boolean running;
+
     /**
      * Load a binary file into memory.
      *
@@ -122,30 +126,6 @@ public class PattyMelt {
         }
     }
 
-    private static String dumpMemory(int address, int numWords, short[] memory) {
-        // FIXME: Make this better. It is a crude bit of debugging right now.
-        StringBuilder buf = new StringBuilder();
-        for (int i = 0; i < numWords; i++) {
-            short value = memory[address + i];
-            char c = (char) value;
-            if (!(Character.isLetterOrDigit(c) || Character.isWhitespace(c))) {
-                c = '.';
-            }
-
-            buf.append(c);
-        }
-
-        return buf.toString();
-    }
-    private Console console;
-    private StateViewer stateViewer;
-    private final DCPU16 cpu = new DCPU16Emulator();
-    private final JButton stepButton = new JButton("Step");
-    private final JButton runButton = new JButton("Run");
-    private final JButton stopButton = new JButton("Stop");
-    private final MemoryTableModel memoryTableModel = new MemoryTableModel(cpu);
-    private volatile boolean running;
-
     private void launch(String filename) throws Exception {
         final Memory memory = cpu.memory();
         File file = new File(filename);
@@ -175,7 +155,7 @@ public class PattyMelt {
     }
 
     private void openConsole() {
-        console = new Console();
+        Console console = new Console();
         cpu.install(console.getScreen(), 0x8000);
         cpu.install(console.getKeyboard(), 0x9000);
         JFrame frame = new JFrame("PattyMelt");
@@ -185,10 +165,14 @@ public class PattyMelt {
     }
 
     private void openStateViewer() {
-        stateViewer = new StateViewer(cpu);
+        StateViewer stateViewer = new StateViewer(cpu);
         JFrame stateFrame = new JFrame("CPU State");
         stateFrame.getContentPane().setLayout(new BorderLayout());
         stateFrame.getContentPane().add(stateViewer.getWidget(), BorderLayout.SOUTH);
+
+        final JButton stepButton = new JButton("Step");
+        final JButton runButton = new JButton("Run");
+        final JButton stopButton = new JButton("Stop");
 
         JComponent controlBox = new JPanel();
         controlBox.add(stepButton);
@@ -247,6 +231,7 @@ public class PattyMelt {
     }
 
     private void openMemoryViewer() {
+        MemoryTableModel memoryTableModel = new MemoryTableModel(cpu);
         JFrame memoryFrame = new JFrame("Memory");
         JTable memoryTable = new JTable(memoryTableModel);
         Font font = new Font("Monospaced", Font.PLAIN, 18);
@@ -289,5 +274,4 @@ public class PattyMelt {
         String filename = args[0];
         application.launch(filename);
     }
-    // FIXE: Add support for undoing/going back in time to debug.
 }
