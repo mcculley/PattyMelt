@@ -128,7 +128,7 @@ public class PattyMelt {
         }
     }
 
-    private void launch(final boolean openConsole, String filename) throws Exception {
+    private void launch(final boolean openConsole, final boolean openStateViewer, final boolean openMemoryViewer, String filename) throws Exception {
         final Memory memory = cpu.memory();
         File file = new File(filename);
 
@@ -153,8 +153,13 @@ public class PattyMelt {
                     openConsole();
                 }
 
-                openStateViewer();
-                openMemoryViewer();
+                if (openStateViewer) {
+                    openStateViewer();
+                }
+
+                if (openMemoryViewer) {
+                    openMemoryViewer();
+                }
             }
         });
     }
@@ -274,22 +279,32 @@ public class PattyMelt {
         LinkedList<String> argList = new LinkedList<String>(Arrays.asList(args));
         String filename = null;
         boolean openConsole = true;
+        boolean openStateViewer = true;
+        boolean openMemoryViewer = true;
         while (!argList.isEmpty()) {
             String arg = argList.removeFirst();
             if (arg.equals("-console")) {
                 openConsole = true;
             } else if (arg.equals("-noconsole")) {
                 openConsole = false;
+            } else if (arg.equals("-stateviewer")) {
+                openStateViewer = true;
+            } else if (arg.equals("-nostateviewer")) {
+                openStateViewer = false;
+            } else if (arg.equals("-memoryviewer")) {
+                openMemoryViewer = true;
+            } else if (arg.equals("-nomemoryviewer")) {
+                openMemoryViewer = false;
             } else {
                 filename = arg;
             }
         }
 
         if (filename == null) {
-            System.err.println("usage: [-console | -noconsole] PattyMelt <hex or binary file>");
+            System.err.println("usage: [-console | -noconsole] [-stateviewer | -nostateviewer] [-memoryviewer | -nomemoryviewer] PattyMelt <hex or binary file>");
         } else {
             PattyMelt application = new PattyMelt();
-            application.launch(openConsole, filename);
+            application.launch(openConsole, openStateViewer, openMemoryViewer, filename);
         }
     }
 }
