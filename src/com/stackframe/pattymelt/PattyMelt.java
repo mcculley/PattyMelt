@@ -37,6 +37,8 @@ import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
+import java.util.LinkedList;
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
@@ -126,7 +128,7 @@ public class PattyMelt {
         }
     }
 
-    private void launch(String filename) throws Exception {
+    private void launch(final boolean openConsole, String filename) throws Exception {
         final Memory memory = cpu.memory();
         File file = new File(filename);
 
@@ -147,7 +149,10 @@ public class PattyMelt {
 
             @Override
             public void run() {
-                openConsole();
+                if (openConsole) {
+                    openConsole();
+                }
+
                 openStateViewer();
                 openMemoryViewer();
             }
@@ -266,12 +271,25 @@ public class PattyMelt {
      * @param args the command line arguments
      */
     public static void main(String[] args) throws Exception {
-        if (args == null || args.length == 0) {
-            System.err.println("This application requires a hex or binary file as input!");
-            return;
+        LinkedList<String> argList = new LinkedList<String>(Arrays.asList(args));
+        String filename = null;
+        boolean openConsole = true;
+        while (!argList.isEmpty()) {
+            String arg = argList.removeFirst();
+            if (arg.equals("-console")) {
+                openConsole = true;
+            } else if (arg.equals("-noconsole")) {
+                openConsole = false;
+            } else {
+                filename = arg;
+            }
         }
-        PattyMelt application = new PattyMelt();
-        String filename = args[0];
-        application.launch(filename);
+
+        if (filename == null) {
+            System.err.println("usage: [-console | -noconsole] PattyMelt <hex or binary file>");
+        } else {
+            PattyMelt application = new PattyMelt();
+            application.launch(openConsole, filename);
+        }
     }
 }
