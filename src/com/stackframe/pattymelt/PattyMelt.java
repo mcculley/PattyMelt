@@ -211,16 +211,7 @@ public class PattyMelt {
                 runButton.setEnabled(false);
                 stopButton.setEnabled(true);
                 stepButton.setEnabled(false);
-                running = true;
-                Thread thread = new Thread(
-                        new Runnable() {
-
-                            @Override
-                            public void run() {
-                                runCPU();
-                            }
-                        }, "DCPU-16");
-                thread.start();
+                launchCPUThread();
             }
         });
 
@@ -238,6 +229,19 @@ public class PattyMelt {
         stateFrame.pack();
         stateFrame.setLocation(0, 100);
         stateFrame.setVisible(true);
+    }
+
+    private void launchCPUThread() {
+        running = true;
+        Runnable r = new Runnable() {
+
+            @Override
+            public void run() {
+                runCPU();
+            }
+        };
+        Thread thread = new Thread(r, "DCPU-16");
+        thread.start();
     }
 
     private void openMemoryViewer() {
