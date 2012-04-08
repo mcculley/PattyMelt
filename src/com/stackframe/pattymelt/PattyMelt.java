@@ -167,77 +167,83 @@ public class PattyMelt {
 
             @Override
             public void run() {
-                console = new Console();
-                cpu.install(console.getScreen(), 0x8000);
-                cpu.install(console.getKeyboard(), 0x9000);
-                JFrame frame = new JFrame("PattyMelt");
-                frame.setSize(342, 330);
-                frame.getContentPane().add(console.getWidget());
-                frame.setVisible(true);
-
-                stateViewer = new StateViewer(cpu);
-                JFrame stateFrame = new JFrame("CPU State");
-                stateFrame.getContentPane().setLayout(new BorderLayout());
-                stateFrame.getContentPane().add(stateViewer.getWidget(), BorderLayout.SOUTH);
-
-                JComponent controlBox = new JPanel();
-                controlBox.add(stepButton);
-                controlBox.add(runButton);
-                stopButton.setEnabled(false);
-                controlBox.add(stopButton);
-                stateFrame.getContentPane().add(controlBox, BorderLayout.NORTH);
-
-                stepButton.addActionListener(new ActionListener() {
-
-                    @Override
-                    public void actionPerformed(ActionEvent ae) {
-                        try {
-                            cpu.step();
-                        } catch (IllegalOpcodeException ioe) {
-                            // FIXME: reflect in GUI
-                            System.err.printf("Illegal opcode 0x%04x encountered.\n", ioe.opcode);
-                        }
-                    }
-                });
-
-                runButton.addActionListener(new ActionListener() {
-
-                    @Override
-                    public void actionPerformed(ActionEvent ae) {
-                        runButton.setEnabled(false);
-                        stopButton.setEnabled(true);
-                        stepButton.setEnabled(false);
-                        running = true;
-                        Thread thread = new Thread(
-                                new Runnable() {
-
-                                    @Override
-                                    public void run() {
-                                        runCPU();
-                                    }
-                                }, "DCPU-16");
-                        thread.start();
-                    }
-                });
-
-                stopButton.addActionListener(new ActionListener() {
-
-                    @Override
-                    public void actionPerformed(ActionEvent ae) {
-                        running = false;
-                        runButton.setEnabled(true);
-                        stopButton.setEnabled(false);
-                        stepButton.setEnabled(true);
-                    }
-                });
-
-                stateFrame.pack();
-                stateFrame.setLocation(0, 100);
-                stateFrame.setVisible(true);
-
+                openConsole();
+                openStateViewer();
                 openMemoryViewer();
             }
         });
+    }
+
+    private void openConsole() {
+        console = new Console();
+        cpu.install(console.getScreen(), 0x8000);
+        cpu.install(console.getKeyboard(), 0x9000);
+        JFrame frame = new JFrame("PattyMelt");
+        frame.setSize(342, 330);
+        frame.getContentPane().add(console.getWidget());
+        frame.setVisible(true);
+    }
+
+    private void openStateViewer() {
+        stateViewer = new StateViewer(cpu);
+        JFrame stateFrame = new JFrame("CPU State");
+        stateFrame.getContentPane().setLayout(new BorderLayout());
+        stateFrame.getContentPane().add(stateViewer.getWidget(), BorderLayout.SOUTH);
+
+        JComponent controlBox = new JPanel();
+        controlBox.add(stepButton);
+        controlBox.add(runButton);
+        stopButton.setEnabled(false);
+        controlBox.add(stopButton);
+        stateFrame.getContentPane().add(controlBox, BorderLayout.NORTH);
+
+        stepButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                try {
+                    cpu.step();
+                } catch (IllegalOpcodeException ioe) {
+                    // FIXME: reflect in GUI
+                    System.err.printf("Illegal opcode 0x%04x encountered.\n", ioe.opcode);
+                }
+            }
+        });
+
+        runButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                runButton.setEnabled(false);
+                stopButton.setEnabled(true);
+                stepButton.setEnabled(false);
+                running = true;
+                Thread thread = new Thread(
+                        new Runnable() {
+
+                            @Override
+                            public void run() {
+                                runCPU();
+                            }
+                        }, "DCPU-16");
+                thread.start();
+            }
+        });
+
+        stopButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                running = false;
+                runButton.setEnabled(true);
+                stopButton.setEnabled(false);
+                stepButton.setEnabled(true);
+            }
+        });
+
+        stateFrame.pack();
+        stateFrame.setLocation(0, 100);
+        stateFrame.setVisible(true);
     }
 
     private void openMemoryViewer() {
@@ -253,7 +259,7 @@ public class PattyMelt {
 
         memoryTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         for (int i = 0; i < 9; i++) {
-            DefaultTableCellRenderer dtcr = new DefaultTableCellRenderer();  
+            DefaultTableCellRenderer dtcr = new DefaultTableCellRenderer();
             dtcr.setHorizontalAlignment(SwingConstants.CENTER);
             TableColumn column = memoryTable.getColumnModel().getColumn(i);
             column.setCellRenderer(dtcr);
