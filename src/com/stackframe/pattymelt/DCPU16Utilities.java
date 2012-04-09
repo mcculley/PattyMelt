@@ -143,6 +143,14 @@ public class DCPU16Utilities {
         return buf.toString();
     }
 
+    /**
+     * Load binary data from an InputStream into memory.
+     *
+     * @param inputStream the InputStream to read from
+     * @param memory the Memory to write the data to
+     * @param offset the offset into the memory to start at
+     * @throws IOException if the stream throws an IOException while reading
+     */
     public static void load(InputStream inputStream, Memory memory, int offset) throws IOException {
         List<Short> values = new ArrayList<Short>();
         int i = 0;
