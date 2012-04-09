@@ -57,31 +57,16 @@ public class PattyMelt {
     /**
      * Load a binary file into memory.
      *
-     * @param memory a ShortBuffer to read the file into
+     * @param memory a Memory to read the file into
      * @param file a File to read from
      * @throws IOException
      */
     private static void loadBinary(Memory memory, File file) throws IOException {
-        int i = 0;
         InputStream inputStream = new FileInputStream(file);
-        while (true) {
-            try {
-                int v1 = inputStream.read();
-                if (v1 == -1) {
-                    return;
-                }
-
-                int v2 = inputStream.read();
-                if (v2 == -1) {
-                    return;
-                }
-
-                short value = (short) ((v2 << 8) | v1);
-                memory.put(i++, value);
-            } catch (IOException ioe) {
-                inputStream.close();
-                throw ioe;
-            }
+        try {
+            DCPU16Utilities.load(inputStream, memory, 0);
+        } finally {
+            inputStream.close();
         }
     }
 
@@ -108,8 +93,8 @@ public class PattyMelt {
 
     private static boolean isBinary(File file) throws IOException {
         InputStream inputStream = new FileInputStream(file);
-        while (true) {
-            try {
+        try {
+            while (true) {
                 int value = inputStream.read();
                 if (value == -1) {
                     return false;
@@ -121,10 +106,9 @@ public class PattyMelt {
                 if (!(isLetterOrDigit || isWhitespace)) {
                     return true;
                 }
-            } catch (IOException ioe) {
-                inputStream.close();
-                throw ioe;
             }
+        } finally {
+            inputStream.close();
         }
     }
 
@@ -139,9 +123,8 @@ public class PattyMelt {
             BufferedReader reader = new BufferedReader(new FileReader(filename));
             try {
                 loadHex(memory, reader);
-            } catch (IOException ioe) {
+            } finally {
                 reader.close();
-                throw ioe;
             }
         }
 

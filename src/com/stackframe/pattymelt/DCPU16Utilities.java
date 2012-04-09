@@ -27,6 +27,12 @@
  */
 package com.stackframe.pattymelt;
 
+import java.io.EOFException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Utilities for dealing with the DCPU16 architecture.
  *
@@ -135,5 +141,26 @@ public class DCPU16Utilities {
         StringBuilder buf = new StringBuilder();
         disassemble(memory, pc, buf);
         return buf.toString();
+    }
+
+    public static void load(InputStream inputStream, Memory memory, int offset) throws IOException {
+        List<Short> values = new ArrayList<Short>();
+        int i = 0;
+        while (true) {
+            int v1 = inputStream.read();
+            if (v1 == -1) {
+                break;
+            }
+
+            int v2 = inputStream.read();
+            if (v2 == -1) {
+                // If we got here, we must have read half of a word.
+                throw new EOFException("unexpected end of file");
+            }
+
+            short value = (short) ((v2 << 8) | v1);
+            values.add(value);
+            memory.put(offset + i++, value);
+        }
     }
 }

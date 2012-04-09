@@ -42,47 +42,13 @@ import javax.swing.JComponent;
  */
 public class SimpleApplet extends JApplet {
 
-    private short[] readData(InputStream inputStream) throws Exception {
-        List<Short> values = new ArrayList<Short>();
-        while (true) {
-            try {
-                int v1 = inputStream.read();
-                if (v1 == -1) {
-                    break;
-                }
-
-                int v2 = inputStream.read();
-                if (v2 == -1) {
-                    break;
-                }
-
-                short value = (short) ((v2 << 8) | v1);
-                values.add(value);
-            } catch (IOException ioe) {
-                inputStream.close();
-                throw ioe;
-            }
-        }
-
-        short[] result = new short[values.size()];
-        for (int i = 0; i < values.size(); i++) {
-            result[i] = values.get(i);
-        }
-
-        return result;
-    }
-
     @Override
     public void init() {
         String program = getParameter("program");
         InputStream inputStream = getClass().getResourceAsStream(program);
         try {
-            short[] programData = readData(inputStream);
             final DCPU16 cpu = new DCPU16Emulator();
-            for (int i = 0; i < programData.length; i++) {
-                cpu.memory().put(i, programData[i]);
-            }
-
+            DCPU16Utilities.load(inputStream, cpu.memory(), 0);
             Console console = new Console();
             cpu.install(console.getScreen(), 0x8000);
             cpu.install(console.getKeyboard(), 0x9000);
