@@ -217,20 +217,28 @@ public class DCPU16Emulator implements DCPU16 {
             case 0x16:
             case 0x17: {
                 short pc = PC();
-                PC((short) (PC() + 1));
+                if (!SKIP) {
+                    PC((short) (PC() + 1));
+                }
                 return (memoryManager.get(0x10000 + (code & 7)) + memoryManager.get(pc)) & 0xffff;
             }
             case 0x18: {
+
                 int sp = SP();
-                SP((short) (sp + 1));
+                if (!SKIP) {
+                    SP((short) (sp + 1));
+                }
                 return sp & 0xffff;
             }
             case 0x19:
                 return SP();
-            case 0x1a:
+            case 0x1a: {
                 short sp = (short) (SP() - 1);
-                SP(sp);
+                if (!SKIP) {
+                    SP(sp);
+                }
                 return sp & 0xffff;
+            }
             case 0x1b:
                 return SP;
             case 0x1c:
@@ -264,6 +272,8 @@ public class DCPU16Emulator implements DCPU16 {
     public void step() throws IllegalOpcodeException {
         // FIXME: Need to figure out if I should make this synchronized or move listener execution to another thread.
         stepActual();
+
+        // FIXME: We should only execute listeners if we didn't skip. Get rid of skipping in favor of PC manipulation.
         CPUEvent event = new CPUEvent(this);
         for (CPUEventListener listener : listeners) {
             listener.instructionExecuted(event);
@@ -296,10 +306,15 @@ public class DCPU16Emulator implements DCPU16 {
 
         short dst = (short) ((op >> 4) & 0x3F);
         int aa = dcpu_opr(dst);
-        int a = memoryManager.get(aa);
+        int a = memoryManager.get(aa) & 0xFFFF;
         short b_op = (short) ((op >> 10) & 0x3F);
         int b_addr = dcpu_opr(b_op);
-        int b = memoryManager.get(b_addr);
+        int b = memoryManager.get(b_addr) & 0xFFFF;
+
+        if (SKIP) {
+            SKIP = false;
+            return;
+        }
 
         int res;
         Opcode opcode = Opcode.values()[op & 0xF];
@@ -386,11 +401,6 @@ public class DCPU16Emulator implements DCPU16 {
             default:
                 res = -1;
                 throw new AssertionError("Shouldn't be able to get here");
-        }
-
-        if (SKIP) {
-            SKIP = false;
-            return;
         }
 
         switch (opcode) {
