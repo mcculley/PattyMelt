@@ -249,7 +249,7 @@ public class DCPU16Emulator implements DCPU16 {
                 short pc = PC();
                 short v = memoryManager.get(pc);
                 PC((short) (pc + 1));
-                return v;
+                return v & 0xFFFF;
             }
             case 0x1f:
                 short pc = PC();
