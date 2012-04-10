@@ -1,0 +1,7 @@
+* Make debugger (as a wrapper around the DCPU16 interface).
+ * Add breakpoints
+* Highlight in memory table: last instruction executed, next instruction, last memory touched
+* Add list of peripherals to GUI
+* Make applet for IDE
+* Add load/reset to GUI
+* Add an assembler
