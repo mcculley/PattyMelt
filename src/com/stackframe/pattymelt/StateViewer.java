@@ -121,6 +121,7 @@ public class StateViewer {
             public void memoryModified(CPUEvent event) {
             }
         });
+        update();
     }
 
     public JComponent getWidget() {
