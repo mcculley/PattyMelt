@@ -34,6 +34,8 @@ import java.util.LinkedList;
 import javax.swing.JComponent;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
 
 /**
  * A console for DCPU-16.
@@ -50,7 +52,19 @@ public class Console {
         @Override
         public void put(int address, short value) {
             super.put(address, value);
-            update();
+            char c = (char) (value & 0x7f);
+            if (c == '\n') {
+                return;
+            }
+
+            int attributes = (value >> 7) & 0x1ff;
+            // FIXME: I have no idea yet how to correctly interpret the color information.
+            setValue(address, c);
+        }
+
+        @Override
+        public short get(int address) {
+            return super.get(toScreen(address));
         }
     };
     private final JTextArea textArea;
@@ -91,9 +105,61 @@ public class Console {
         }
     };
 
+    private void setValue(final int address, final char c) {
+        if (SwingUtilities.isEventDispatchThread()) {
+            setValueOnSwingThread(address, c);
+        } else {
+            try {
+                SwingUtilities.invokeAndWait(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        setValueOnSwingThread(address, c);
+                    }
+                });
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    private void setValueOnSwingThread(int address, char c) {
+        assert SwingUtilities.isEventDispatchThread();
+        Document document = textArea.getDocument();
+        try {
+            address = toDocument(address);
+            document.remove(address, 1);
+            String s = "" + c;
+            document.insertString(address, s, null);
+        } catch (BadLocationException ble) {
+            // This shouldn't happen because we control the incoming location.
+            throw new AssertionError(ble);
+        }
+    }
+
+    private int toDocument(int address) {
+        int incr = address / numColumns;
+        return address + incr;
+    }
+
+    private int toScreen(int position) {
+        int decr = position / (numColumns + 1);
+        return position - decr;
+    }
+
     public Console() {
         textArea = new JTextArea(numRows, numColumns);
         textArea.setFont(new Font("Monospaced", Font.PLAIN, 18));
+        StringBuilder buf = new StringBuilder();
+        for (int i = 0, c = 0; i < grid; i++) {
+            buf.append(' ');
+            if (++c == numColumns) {
+                buf.append('\n');
+                c = 0;
+            }
+        }
+
+        textArea.setText(buf.toString());
         textArea.addKeyListener(new KeyListener() {
 
             @Override
@@ -116,47 +182,6 @@ public class Console {
 
     public JComponent getWidget() {
         return textArea;
-    }
-
-    private void update() {
-        if (SwingUtilities.isEventDispatchThread()) {
-            updateOnSwingThread();
-        } else {
-            try {
-                SwingUtilities.invokeAndWait(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        updateOnSwingThread();
-                    }
-                });
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }
-    }
-
-    private void updateOnSwingThread() {
-        // FIXME: Be smarter than redrawing whole screen.
-        StringBuilder buf = new StringBuilder();
-        for (int i = 0, col = 0; i < grid; i++, col++) {
-            short word = textRAM.get(i);
-            if (word != 0) {
-                char c = (char) (word & 0x7f);
-                int attributes = (word >> 7) & 0x1ff;
-                // FIXME: We have no idea yet how to correctly interpret the color information.
-                buf.append(c);
-            } else {
-                buf.append(' ');
-            }
-
-            if (col == numColumns - 1) {
-                buf.append('\n');
-                col = 0;
-            }
-        }
-
-        textArea.setText(buf.toString());
     }
 
     public Peripheral getScreen() {
