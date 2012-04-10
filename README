@@ -4,4 +4,8 @@ Once you have it built, you can run something like:
 
 java -cp build/classes com.stackframe.pattymelt.PattyMelt test/hello.bin
 
-To see hello world program run on the console.
+or
+
+java -jar pattymelt.jar test/hello.bin
+
+To see a hello world program run on the console. You can find a binary download and examples at http://mcculley.github.com/PattyMelt/
