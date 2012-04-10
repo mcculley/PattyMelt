@@ -47,11 +47,10 @@ public class Console {
     // FIXME: Add keyboard support
     private static final int bufferSize = 16;
     private final LinkedList<Short> keyboardBuffer = new LinkedList<Short>();
-    private final Memory textRAM = new ArrayMemory(grid) {
+    private final Memory textRAM = new Memory() {
 
         @Override
         public void put(int address, short value) {
-            super.put(address, value);
             char c = (char) (value & 0x7f);
             if (c == '\n') {
                 return;
@@ -64,7 +63,17 @@ public class Console {
 
         @Override
         public short get(int address) {
-            return super.get(toScreen(address));
+            try {
+                return (short) textArea.getDocument().getText(toDocument(address), 1).charAt(0);
+            } catch (BadLocationException ble) {
+                // This shouldn't happen because we control the incoming location.
+                throw new AssertionError(ble);
+            }
+        }
+
+        @Override
+        public int size() {
+            return grid;
         }
     };
     private final JTextArea textArea;
@@ -140,11 +149,6 @@ public class Console {
     private int toDocument(int address) {
         int incr = address / numColumns;
         return address + incr;
-    }
-
-    private int toScreen(int position) {
-        int decr = position / (numColumns + 1);
-        return position - decr;
     }
 
     public Console() {
