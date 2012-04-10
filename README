@@ -8,4 +8,6 @@ or
 
 java -jar pattymelt.jar test/hello.bin
 
-To see a hello world program run on the console. You can find a binary download and examples at http://mcculley.github.com/PattyMelt/
+to see a hello world program run on the console.
+
+You can find a binary download and examples at http://mcculley.github.com/PattyMelt/
