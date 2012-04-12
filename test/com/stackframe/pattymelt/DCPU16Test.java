@@ -27,7 +27,6 @@
  */
 package com.stackframe.pattymelt;
 
-import java.nio.ShortBuffer;
 import org.junit.*;
 import static org.junit.Assert.*;
 
