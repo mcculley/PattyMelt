@@ -1,7 +1,14 @@
 * Make debugger (as a wrapper around the DCPU16 interface).
  * Add breakpoints
+ * Add watchpoints
+ * Add watchpoints with expressions
+* Make wrapper around DCPU16 interface to limit to 100KHz and measure speed
 * Highlight in memory table: last instruction executed, next instruction, last memory touched
 * Add list of peripherals to GUI
 * Make applet for IDE
 * Add load/reset to GUI
 * Add an assembler
+* Add a reset button
+* Clever ideas in http://0x10co.de/
+ * Use a tooltip to disassemble at a given memory location
+ * Automatically dereference registers
