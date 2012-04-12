@@ -27,10 +27,7 @@
  */
 package com.stackframe.pattymelt;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.JApplet;
 import javax.swing.JComponent;
@@ -49,7 +46,7 @@ public class SimpleApplet extends JApplet {
         try {
             final DCPU16 cpu = new DCPU16Emulator();
             DCPU16Utilities.load(inputStream, cpu.memory(), 0);
-            Console console = new Console();
+            Console console = new Console(16, 32);
             cpu.install(console.getScreen(), 0x8000);
             cpu.install(console.getKeyboard(), 0x9000);
             JComponent screenWidget = console.getWidget();

@@ -74,7 +74,7 @@ public class PattyMelt {
      * Load a file into memory. The file is assumed to be lines of hexadecimal
      * 16-bit words.
      *
-     * @param memory a ShortBuffer to read the file into
+     * @param memory Memory to read the file into
      * @param reader a BufferedReader to read from
      * @throws IOException
      */
@@ -152,7 +152,7 @@ public class PattyMelt {
     }
 
     private void openConsole() {
-        Console console = new Console();
+        Console console = new Console(16, 32);
         cpu.install(console.getScreen(), 0x8000);
         cpu.install(console.getKeyboard(), 0x9000);
         JFrame frame = new JFrame("PattyMelt");

@@ -27,8 +27,6 @@
  */
 package com.stackframe.pattymelt;
 
-import java.nio.ShortBuffer;
-
 /**
  * An abstraction for peripherals connected to a DCPU-16.
  *

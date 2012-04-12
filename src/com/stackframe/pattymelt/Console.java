@@ -77,7 +77,7 @@ public class Console {
         }
     };
     private final JTextArea textArea;
-    private static final int numRows = 16, numColumns = 32, grid = numRows * numColumns;
+    private final int numRows, numColumns, grid;
     private final Peripheral screen = new Peripheral() {
 
         @Override
@@ -151,9 +151,13 @@ public class Console {
         return address + incr;
     }
 
-    public Console() {
+    public Console(int numRows, int numColumns) {
+        this.numRows = numRows;
+        this.numColumns = numColumns;
+        grid = numRows * numColumns;
         textArea = new JTextArea(numRows, numColumns);
         textArea.setFont(new Font("Monospaced", Font.PLAIN, 18));
+        textArea.setEditable(false);
         StringBuilder buf = new StringBuilder();
         for (int i = 0, c = 0; i < grid; i++) {
             buf.append(' ');

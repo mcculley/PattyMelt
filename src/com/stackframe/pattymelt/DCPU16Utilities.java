@@ -166,6 +166,7 @@ public class DCPU16Utilities {
                 throw new EOFException("unexpected end of file");
             }
 
+            // FIXME: Is this the correct endianness of bytes in a word? We need standardization on this.
             short value = (short) ((v2 << 8) | v1);
             values.add(value);
             memory.put(offset + i++, value);
