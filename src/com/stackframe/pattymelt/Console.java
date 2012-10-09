@@ -29,7 +29,7 @@ package com.stackframe.pattymelt;
 
 import java.awt.Font;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+import java.awt.event.KeyAdapter;
 import java.util.LinkedList;
 import javax.swing.JComponent;
 import javax.swing.JTextArea;
@@ -168,16 +168,7 @@ public class Console {
         }
 
         textArea.setText(buf.toString());
-        textArea.addKeyListener(new KeyListener() {
-
-            @Override
-            public void keyPressed(KeyEvent ke) {
-            }
-
-            @Override
-            public void keyReleased(KeyEvent ke) {
-            }
-
+        textArea.addKeyListener(new KeyAdapter() {
             @Override
             public void keyTyped(KeyEvent ke) {
                 if (keyboardBuffer.size() < bufferSize) {
